@@ -1,1 +1,1 @@
-export * from './lib/process-manager';
+export * from './graph';
