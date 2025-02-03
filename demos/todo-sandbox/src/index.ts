@@ -1,1 +1,1 @@
-export * from './lib/todo-sandbox';
+export * from './app';

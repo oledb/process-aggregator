@@ -5,3 +5,4 @@ export {
   addInstance,
   addSingleton,
 } from './context-builder';
+export * from './decorators';
