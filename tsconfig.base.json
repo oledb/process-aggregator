@@ -17,7 +17,8 @@
     "paths": {
       "@process-aggregator/process-manager": [
         "packges/process-manager/src/index.ts"
-      ]
+      ],
+      "@process-aggregator/todo-sandbox": ["demos/todo-sandbox/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

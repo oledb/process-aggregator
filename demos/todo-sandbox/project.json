@@ -1,0 +1,21 @@
+{
+  "name": "todo-sandbox",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "demos/todo-sandbox/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/demos/todo-sandbox",
+        "main": "demos/todo-sandbox/src/index.ts",
+        "tsConfig": "demos/todo-sandbox/tsconfig.lib.json",
+        "assets": ["demos/todo-sandbox/*.md"],
+        "format": ["cjs"],
+        "generatePackageJson": true
+      }
+    }
+  }
+}
