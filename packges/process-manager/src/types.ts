@@ -41,6 +41,6 @@ export const INITIAL_ACTION_COMMAND = 'create_initial_action';
 
 export interface IInitialTaskAction<S extends string, P, IS> {
   processName: ProcessName;
-  validateInitalState?(initialState: IS): Promise<TaskValidationState>;
+  validateInitialState?(initialState: IS): Promise<TaskValidationState>;
   createTask(initialState: IS): Promise<ITask<S, P>>;
 }

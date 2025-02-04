@@ -57,8 +57,8 @@ export class Process<S extends string, P, C extends string>
       throw new Error(INITIAL_COMMAND_NOT_FOUND);
     }
     initialAction.processName = this.processName;
-    if (initialAction.validateInitalState) {
-      return initialAction.validateInitalState(initialState);
+    if (initialAction.validateInitialState) {
+      return initialAction.validateInitialState(initialState);
     }
     return {
       valid: 'true',

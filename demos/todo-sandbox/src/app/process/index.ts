@@ -1,1 +1,1 @@
-export * from './bootstrap-process';
+export * from '../bootstrap-app';

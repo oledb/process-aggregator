@@ -8,3 +8,5 @@ export interface Todo {
   workStared: Date | null;
   priority: Priority;
 }
+
+export type NewTodo = Pick<Todo, 'name' | 'text'> & Partial<Pick<Todo, 'priority'>>
