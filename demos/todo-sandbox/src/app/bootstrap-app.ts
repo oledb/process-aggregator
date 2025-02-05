@@ -8,6 +8,7 @@ import { TodoCommand, TodoStatus } from './process/types';
 import { CloseAction, CompleteAction, HoldAction, InitialTodoAction, ToWorkAction } from './process/actions';
 import { App } from './app';
 import { TodoTaskRepository } from './services/todo-task-repository';
+import { Todo } from './models';
 
 export function bootstrapApp() {
   const context = createContextBuilder()
@@ -20,7 +21,7 @@ export function bootstrapApp() {
     ))
     .build();
 
-  const processManager = createProcessBuilder<TodoStatus, unknown, TodoCommand>({
+  const processManager = createProcessBuilder<TodoStatus, Todo, TodoCommand>({
     name: 'todo demo',
     version: '1.0'
   }, context).pipe(

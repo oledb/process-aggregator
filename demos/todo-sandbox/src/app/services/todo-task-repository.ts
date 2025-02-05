@@ -28,6 +28,15 @@ export class TodoTaskRepository {
     };
   }
 
+  async updateTask(task: ITask<TodoStatus, Todo>): Promise<void> {
+    const temp = this.tasks.find((t) => t.id === task.id);
+    if (!temp) {
+      throw new Error('Task not found');
+    }
+    const index = this.tasks.indexOf(temp);
+    this.tasks[index] = this.cloneTodoTask(task);
+  }
+
   private cloneTodoTask(
     task: ITask<TodoStatus, Todo>
   ): ITask<TodoStatus, Todo> {

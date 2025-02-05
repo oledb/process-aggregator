@@ -58,25 +58,38 @@ export class InitialTodoAction
 
 export class ToWorkAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
-  async validateTask?(
-    task: ITask<TodoStatus, Todo>
-  ): Promise<TaskValidationState> {
-    throw new Error('Method not implemented.');
-  }
+
+  constructor(
+    @Inject(TodoTaskRepository)
+    private readonly todoRepository: TodoTaskRepository
+  ) {}
+
   async updateTask(
     task: ITask<TodoStatus, Todo>
   ): Promise<ITask<TodoStatus, Todo>> {
-    throw new Error('Method not implemented.');
+    await this.todoRepository.updateTask({
+      ...task,
+      status: 'in-progress',
+    });
+    return this.todoRepository.getTask(task.id);
   }
 }
 
 export class HoldAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
-  validateTask?(task: ITask<TodoStatus, Todo>): Promise<TaskValidationState> {
-    throw new Error('Method not implemented.');
-  }
-  updateTask(task: ITask<TodoStatus, Todo>): Promise<ITask<TodoStatus, Todo>> {
-    throw new Error('Method not implemented.');
+
+  constructor(
+    @Inject(TodoTaskRepository)
+    private readonly todoRepository: TodoTaskRepository
+  ) {}
+  async updateTask(
+    task: ITask<TodoStatus, Todo>
+  ): Promise<ITask<TodoStatus, Todo>> {
+    await this.todoRepository.updateTask({
+      ...task,
+      status: 'holding',
+    });
+    return this.todoRepository.getTask(task.id);
   }
 }
 

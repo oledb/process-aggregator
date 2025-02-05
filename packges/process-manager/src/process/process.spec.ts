@@ -45,7 +45,9 @@ describe('toshokan-book-manager', () => {
 
     class ToWorkAction implements IAction<Status, Payload> {
       processName!: ProcessName;
-      async updateTask(task: ITask<Status, Payload>): Promise<ITask<Status, Payload>> {
+      async updateTask(
+        task: ITask<Status, Payload>
+      ): Promise<ITask<Status, Payload>> {
         return {
           id: task.id,
           status: 'in-progress',
@@ -57,7 +59,9 @@ describe('toshokan-book-manager', () => {
 
     class CloseAction implements IAction<Status, Payload> {
       processName!: ProcessName;
-      async validateTask(task: ITask<Status, Payload>): Promise<TaskValidationState> {
+      async validateTask(
+        task: ITask<Status, Payload>
+      ): Promise<TaskValidationState> {
         if (!task.payload.result) {
           return {
             valid: 'false',
@@ -67,7 +71,9 @@ describe('toshokan-book-manager', () => {
         return { valid: 'true' };
       }
 
-      async updateTask(task: ITask<Status, Payload>): Promise<ITask<Status, Payload>> {
+      async updateTask(
+        task: ITask<Status, Payload>
+      ): Promise<ITask<Status, Payload>> {
         return {
           id: task.id,
           status: 'in-progress',
@@ -83,115 +89,142 @@ describe('toshokan-book-manager', () => {
           addInitialAction(CreateAction),
           addActions<Status, Payload, Command>(
             ['to-work', ToWorkAction],
-            ['close', CloseAction],
-          ),
+            ['close', CloseAction]
+          )
         )
         .pipe(addActionContext())
         .build();
       const process = createProcessBuilder<Status, Payload, Command>(
         { ...processName },
-        context,
+        context
       )
         .pipe(
           addSteps<Status, Payload, Command>('new', 'in-progress', 'closed'),
           addRelations<Status, Payload, Command>(
             ['new', 'in-progress', 'to-work'],
-            ['in-progress', 'closed', 'close'],
-          ),
+            ['new', 'closed', 'close'],
+            ['in-progress', 'closed', 'close']
+          )
         )
         .build(getProcessFactory());
 
-      it('create task', async () => {
-        const task = await process.createInitialTask<Payload>({
-          name: 'test task',
+      describe('main', () => {
+        it('create task', async () => {
+          const task = await process.createInitialTask<Payload>({
+            name: 'test task',
+          });
+
+          expect(task).toBeDefined();
+          expect(task.processName).toEqual(processName);
+          expect(task.payload).toEqual({ name: 'test task' });
+          expect(task.status).toEqual('new');
         });
 
-        expect(task).toBeDefined();
-        expect(task.processName).toEqual(processName);
-        expect(task.payload).toEqual({ name: 'test task' });
-        expect(task.status).toEqual('new');
-      });
+        it('validate "to-work" command', async () => {
+          const newTask: ITask<Status, Payload> = {
+            id: '123',
+            processName,
+            status: 'new',
+            payload: {
+              name: 'test task',
+            },
+          };
 
-      it('validate "to-work" command', async () => {
-        const newTask: ITask<Status, Payload> = {
-          id: '123',
-          processName,
-          status: 'new',
-          payload: {
-            name: 'test task',
-          },
-        };
+          const newTaskValidationStatus = await process.validateCommand(
+            'to-work',
+            newTask
+          );
 
-        const newTaskValidationStatus = await process.validateCommand('to-work', newTask);
+          expect(newTaskValidationStatus).toBeDefined();
+          expect(newTaskValidationStatus.valid).toEqual('true');
+        });
 
-        expect(newTaskValidationStatus).toBeDefined();
-        expect(newTaskValidationStatus.valid).toEqual('true');
-      });
+        it('move task from "new" status to "in-progress"', async () => {
+          const newTask: ITask<Status, Payload> = {
+            id: '123',
+            processName,
+            status: 'new',
+            payload: {
+              name: 'test task',
+            },
+          };
 
-      it('move task from "new" status to "in-progress"', async () => {
-        const newTask: ITask<Status, Payload> = {
-          id: '123',
-          processName,
-          status: 'new',
-          payload: {
-            name: 'test task',
-          },
-        };
+          const inProgressTask = await process.invokeCommand(
+            'to-work',
+            newTask
+          );
 
-        const inProgressTask = await process.invokeCommand('to-work', newTask);
+          expect(inProgressTask).toBeDefined();
+          expect(inProgressTask).toEqual<ITask<Status, Payload>>({
+            ...newTask,
+            status: 'in-progress',
+          });
+        });
 
-        expect(inProgressTask).toBeDefined();
-        expect(inProgressTask).toEqual<ITask<Status, Payload>>({
-          ...newTask,
-          status: 'in-progress',
+        it('throw error on validation when no relation between step', () => {
+          const newTask: ITask<Status, Payload> = {
+            id: '123',
+            processName,
+            status: 'new',
+            payload: {
+              name: 'test task',
+            },
+          };
+
+          expect(() =>
+            process.validateCommand('review', newTask)
+          ).rejects.toThrow(getCommandNotFoundErrorMessage('review'));
+        });
+
+        it('validation failed for incorrect task', async () => {
+          const inProgressTask: ITask<Status, Payload> = {
+            id: '123',
+            processName,
+            status: 'in-progress',
+            payload: {
+              name: 'test task',
+            },
+          };
+
+          const result = await process.validateCommand('close', inProgressTask);
+          expect(result.valid).toEqual('false');
+          if (result.valid === 'false') {
+            expect(result.errorMessage).toEqual('Result field is required');
+          }
+        });
+
+        it('throw error on invocation when no relation between step', () => {
+          const newTask: ITask<Status, Payload> = {
+            id: '123',
+            processName,
+            status: 'new',
+            payload: {
+              name: 'test task',
+            },
+          };
+
+          expect(() =>
+            process.invokeCommand('review', newTask)
+          ).rejects.toThrow(getCommandNotFoundErrorMessage('review'));
         });
       });
 
-      it('throw error on validation when no relation between step', () => {
-        const newTask: ITask<Status, Payload> = {
-          id: '123',
-          processName,
-          status: 'new',
-          payload: {
-            name: 'test task',
-          },
-        };
+      describe('getAvailableStatusCommands', () => {
+        it('get available commands for "new" status', () => {
+          const commands = process.getAvailableStatusCommands('new');
+          expect(commands).toContain<Command>('close');
+          expect(commands).toContain<Command>('to-work');
+        });
 
-        expect(() => process.validateCommand('review', newTask)).rejects.toThrow(
-          getCommandNotFoundErrorMessage('review'),
-        );
-      });
+        it('get available commands for "in-progress" status', () => {
+          const commands = process.getAvailableStatusCommands('in-progress');
+          expect(commands).toEqual<Command[]>(['close']);
+        });
 
-      it('validation failed for incorrect task', async () => {
-        const inProgressTask: ITask<Status, Payload> = {
-          id: '123',
-          processName,
-          status: 'in-progress',
-          payload: {
-            name: 'test task',
-          },
-        };
-
-        const result = await process.validateCommand('close', inProgressTask);
-        expect(result.valid).toEqual('false');
-        if (result.valid === 'false') {
-          expect(result.errorMessage).toEqual('Result field is required');
-        }
-      });
-
-      it('throw error on invocation when no relation between step', () => {
-        const newTask: ITask<Status, Payload> = {
-          id: '123',
-          processName,
-          status: 'new',
-          payload: {
-            name: 'test task',
-          },
-        };
-
-        expect(() => process.invokeCommand('review', newTask)).rejects.toThrow(
-          getCommandNotFoundErrorMessage('review'),
-        );
+        it('get available commands for "closed" status', () => {
+          const commands = process.getAvailableStatusCommands('closed');
+          expect(commands).toEqual<Command[]>([]);
+        });
       });
     });
   });

@@ -16,7 +16,7 @@ import { GraphProcessor } from '../graph';
 export function getProcessFactory<
   S extends string,
   P,
-  C extends string,
+  C extends string
 >(): ProcessFactory<S, P, C> {
   return (processName, context) => new Process(processName, context);
 }
@@ -28,7 +28,7 @@ export class Process<S extends string, P, C extends string>
   readonly actionContext: ActionContext<S, P, C>;
   constructor(
     public readonly processName: ProcessName,
-    private readonly context: IContext,
+    private readonly context: IContext
   ) {
     this.actionContext = context.getService(ActionContext<S, P, C>);
   }
@@ -49,9 +49,11 @@ export class Process<S extends string, P, C extends string>
     this.graph.addEdge(fromStep.value, toStep.value, { command });
   }
 
-  async validateInitialState<IS>(initialState: IS): Promise<TaskValidationState> {
+  async validateInitialState<IS>(
+    initialState: IS
+  ): Promise<TaskValidationState> {
     const initialAction = this.actionContext.getAction(
-      INITIAL_ACTION_COMMAND as C,
+      INITIAL_ACTION_COMMAND as C
     ) as unknown as IInitialTaskAction<S, P, IS>;
     if (!initialAction) {
       throw new Error(INITIAL_COMMAND_NOT_FOUND);
@@ -66,7 +68,7 @@ export class Process<S extends string, P, C extends string>
   }
   async createInitialTask<IS>(initialState: IS): Promise<ITask<S, P>> {
     const initialAction = this.actionContext.getAction(
-      INITIAL_ACTION_COMMAND as C,
+      INITIAL_ACTION_COMMAND as C
     ) as unknown as IInitialTaskAction<S, P, IS>;
     if (!initialAction) {
       throw new Error(INITIAL_COMMAND_NOT_FOUND);
@@ -75,7 +77,10 @@ export class Process<S extends string, P, C extends string>
     return initialAction.createTask(initialState);
   }
 
-  async validateCommand(command: C, task: ITask<S, P>): Promise<TaskValidationState> {
+  async validateCommand(
+    command: C,
+    task: ITask<S, P>
+  ): Promise<TaskValidationState> {
     const weight = this.graph.searchEdges((e) => e.command === command)[0];
     if (!weight) {
       throw new Error(getCommandNotFoundErrorMessage(command));
@@ -99,6 +104,14 @@ export class Process<S extends string, P, C extends string>
     return action.updateTask(task);
   }
 
+  getAvailableStatusCommands(status: S): C[] {
+    const node = this.graph.searchNodes((n) => n.status === status)[0];
+    if (!node) {
+      throw new Error(getStepNotFoundErrorMessage(status));
+    }
+    return this.graph.getNodeWeightsById(node.id).map((e) => e.command);
+  }
+
   toProcess<Process extends IProcess<S, P, C> = IProcess<S, P, C>>(): Process {
     return this as unknown as Process;
   }
@@ -109,3 +122,5 @@ export const getCommandNotFoundErrorMessage = (status: string) =>
   `"${status}" command not found`;
 export const getStatusNotFoundErrorMessage = (status: string) =>
   `"${status}" status not found`;
+export const getStepNotFoundErrorMessage = (status: string) =>
+  `Step for status "${status}" not found`;

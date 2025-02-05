@@ -1,4 +1,3 @@
-
 import {
   IRelationWeight,
   IStep,
@@ -14,6 +13,7 @@ export interface IProcess<S extends string, P, C extends string> {
   createInitialTask<IS>(initialState: IS): Promise<ITask<S, P>>;
   validateCommand(command: C, task: ITask<S, P>): Promise<TaskValidationState>;
   invokeCommand(command: C, task: ITask<S, P>): Promise<ITask<S, P>>;
+  getAvailableStatusCommands(status: S): C[];
 }
 
 export interface IProcessWritable<S extends string, P, C extends string> {
@@ -25,5 +25,5 @@ export interface IProcessWritable<S extends string, P, C extends string> {
 }
 
 export type ProcessBuilderOperators<S extends string, P, C extends string> = (
-  process: IProcessWritable<S, P, C>,
+  process: IProcessWritable<S, P, C>
 ) => IProcessWritable<S, P, C>;
