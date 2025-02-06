@@ -52,10 +52,12 @@ export class Process<S extends string, P, C extends string>
   async validateInitialState<IS>(
     initialState: IS
   ): Promise<TaskValidationState> {
-    const initialAction = this.actionContext.getAction(
-      INITIAL_ACTION_COMMAND as C
-    ) as unknown as IInitialTaskAction<S, P, IS>;
-    if (!initialAction) {
+    let initialAction: IInitialTaskAction<S, P, IS> | null = null;
+    try {
+      initialAction = this.actionContext.getAction(
+        INITIAL_ACTION_COMMAND as C
+      ) as unknown as IInitialTaskAction<S, P, IS>;
+    } catch {
       throw new Error(INITIAL_COMMAND_NOT_FOUND);
     }
     initialAction.processName = this.processName;
@@ -67,10 +69,12 @@ export class Process<S extends string, P, C extends string>
     };
   }
   async createInitialTask<IS>(initialState: IS): Promise<ITask<S, P>> {
-    const initialAction = this.actionContext.getAction(
-      INITIAL_ACTION_COMMAND as C
-    ) as unknown as IInitialTaskAction<S, P, IS>;
-    if (!initialAction) {
+    let initialAction: IInitialTaskAction<S, P, IS> | null = null;
+    try {
+      initialAction = this.actionContext.getAction(
+        INITIAL_ACTION_COMMAND as C
+      ) as unknown as IInitialTaskAction<S, P, IS>;
+    } catch {
       throw new Error(INITIAL_COMMAND_NOT_FOUND);
     }
     initialAction.processName = this.processName;
