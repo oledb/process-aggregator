@@ -82,6 +82,7 @@ export class HoldAction implements IAction<TodoStatus, Todo> {
     @Inject(TodoTaskRepository)
     private readonly todoRepository: TodoTaskRepository
   ) {}
+
   async updateTask(
     task: ITask<TodoStatus, Todo>
   ): Promise<ITask<TodoStatus, Todo>> {
@@ -95,20 +96,36 @@ export class HoldAction implements IAction<TodoStatus, Todo> {
 
 export class CompleteAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
-  validateTask?(task: ITask<TodoStatus, Todo>): Promise<TaskValidationState> {
-    throw new Error('Method not implemented.');
-  }
-  updateTask(task: ITask<TodoStatus, Todo>): Promise<ITask<TodoStatus, Todo>> {
-    throw new Error('Method not implemented.');
+
+  constructor(
+    @Inject(TodoTaskRepository)
+    private readonly todoRepository: TodoTaskRepository
+  ) {}
+
+  async updateTask(
+    task: ITask<TodoStatus, Todo>
+  ): Promise<ITask<TodoStatus, Todo>> {
+    await this.todoRepository.updateTask({
+      ...task,
+      status: 'completed',
+    });
+    return this.todoRepository.getTask(task.id);
   }
 }
 
 export class CloseAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
-  validateTask?(task: ITask<TodoStatus, Todo>): Promise<TaskValidationState> {
-    throw new Error('Method not implemented.');
-  }
-  updateTask(task: ITask<TodoStatus, Todo>): Promise<ITask<TodoStatus, Todo>> {
-    throw new Error('Method not implemented.');
+  constructor(
+    @Inject(TodoTaskRepository)
+    private readonly todoRepository: TodoTaskRepository
+  ) {}
+  async updateTask(
+    task: ITask<TodoStatus, Todo>
+  ): Promise<ITask<TodoStatus, Todo>> {
+    await this.todoRepository.updateTask({
+      ...task,
+      status: 'closed',
+    });
+    return this.todoRepository.getTask(task.id);
   }
 }
