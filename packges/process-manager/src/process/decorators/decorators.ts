@@ -14,7 +14,7 @@ export function Action<S extends string, P, C extends string>(
 ) {
   const { command, relations, processName } = properties;
 
-  return (target: Type<IAction<S, P>>) => {
+  return <A extends Type<IAction<S, P>>>(target: A) => {
     getGlobalStore().setActionMetadata({
       command,
       relations: relations ?? [],

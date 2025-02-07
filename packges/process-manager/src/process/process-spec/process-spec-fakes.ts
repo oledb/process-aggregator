@@ -11,7 +11,7 @@ import {
   addRelations,
   addSteps,
   createProcessBuilder,
-} from '../process-builder';
+} from '../process-builder/process-builder';
 import { addActionContext } from '../action-context';
 import { getProcessFactory } from '../process';
 import { createContextBuilder, IContext } from '../../context';

@@ -18,7 +18,7 @@ import {
 } from './process-spec-fakes';
 import { deepClone } from '../../utils/types/objects';
 import { addActionContext } from '../action-context';
-import { addInitialAction } from '../process-builder';
+import { addInitialAction } from '../process-builder/process-builder';
 import { createContextBuilder } from '../../context';
 
 describe('process-manager', () => {

@@ -1,6 +1,7 @@
-import { IAction, ITask, ProcessName } from '../../types';
+import { ProcessName } from '../../types';
 import { Action } from './decorators';
 import { ActionMetadata, getGlobalStore } from './global-store';
+import { getFakeAction } from './decorators-spec-utils';
 
 describe('process-manager', () => {
   describe('decorators', () => {
@@ -12,25 +13,13 @@ describe('process-manager', () => {
 
     afterEach(() => getGlobalStore().clear());
 
-    function getFakeAction() {
-      return class implements IAction<FakeStatus, FakePayload> {
-        processName!: ProcessName;
-
-        async updateTask(
-          task: ITask<FakeStatus, FakePayload>
-        ): Promise<ITask<FakeStatus, FakePayload>> {
-          return task;
-        }
-      };
-    }
-
     it('add @Action decorator to action class', () => {
       @Action<FakeStatus, FakePayload, FakeCommand>({
         command: 'close',
         processName: processNameV1,
         relations: [['active', 'closed']],
       })
-      class CloseAction extends getFakeAction() {}
+      class CloseAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
       const [actionMetadata] =
         getGlobalStore().getActionsMetadata(processNameV1);
@@ -50,14 +39,14 @@ describe('process-manager', () => {
         processName: processNameV1,
         relations: [['active', 'closed']],
       })
-      class CloseAction extends getFakeAction() {}
+      class CloseAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
       @Action<FakeStatus, FakePayload, FakeCommand>({
         command: 'activate',
         processName: processNameV2,
         relations: [['active', 'closed']],
       })
-      class ActivateAction extends getFakeAction() {}
+      class ActivateAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
       const actionMetadataV1 =
         getGlobalStore().getActionsMetadata(processNameV1);

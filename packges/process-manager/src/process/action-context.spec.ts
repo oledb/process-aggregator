@@ -1,7 +1,7 @@
 import { addSingleton, createContextBuilder } from '../context';
 import { ActionContext, addActionContext } from './action-context';
 import { IAction, ITask, ProcessName } from '../types';
-import { addAction, addActions } from './process-builder';
+import { addAction, addActions } from './process-builder/process-builder';
 import { Inject } from '../context/decorators';
 
 describe('process-manager', () => {

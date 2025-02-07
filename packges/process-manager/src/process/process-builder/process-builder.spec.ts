@@ -1,6 +1,6 @@
 import { createContextBuilder } from '../../context';
 import { addActionContext } from '../action-context';
-import { addRelation, addStep, createProcessBuilder } from '../process-builder';
+import { addRelation, addStep, createProcessBuilder } from './process-builder';
 import { getProcessFactory, Process } from '../process';
 import { ProcessName } from '../../types';
 

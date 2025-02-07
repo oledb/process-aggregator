@@ -10,7 +10,7 @@ import {
 import { IContext } from '../context';
 import { IProcess, IProcessWritable } from './types';
 import { ActionContext } from './action-context';
-import { ProcessFactory } from './process-builder';
+import { ProcessFactory } from './process-builder/process-builder';
 import { GraphProcessor } from '../graph';
 
 export function getProcessFactory<
