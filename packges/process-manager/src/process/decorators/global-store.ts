@@ -26,6 +26,9 @@ export class GlobalStore {
       this.processes.set(pn, new Map());
     }
     const actions = this.processes.get(pn);
+    if (!actions) {
+      throw new Error(`Actions for process ${pn} not found`);
+    }
     if (actions.has(command)) {
       throw new Error(actionHasBeenAlreadyAddedToStore(command, processName));
     }
@@ -37,7 +40,11 @@ export class GlobalStore {
     if (!this.processes.has(pn)) {
       return [];
     }
-    return [...this.processes.get(pn).values()];
+    const actions = this.processes.get(pn);
+    if (!actions) {
+      throw new Error(`Actions for process ${pn} not found`);
+    }
+    return [...actions.values()];
   }
 
   clear() {

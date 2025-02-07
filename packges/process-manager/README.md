@@ -5,6 +5,7 @@
   * [x] декоратор `@Action`
   * [x] функцию `addActionsFromStore`
   * [x] функцию `addRelationsFromStore`
+  * [ ] добавить @InitialAction
   * [ ] Рефакторинг примера
 * [ ] Сделать новый слой валидации CRUD
   * [ ] Слой обновления данных

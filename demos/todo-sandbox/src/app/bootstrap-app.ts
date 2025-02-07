@@ -1,22 +1,15 @@
 import {
   addActionContext,
-  addActions,
+  addActionsFromStore,
   addInitialAction,
-  addRelations,
+  addRelationsAndStepsFromStore,
   addSingleton,
-  addSteps,
   createContextBuilder,
   createProcessBuilder,
   getProcessFactory,
 } from '@process-aggregator/process-manager';
-import { TodoCommand, TodoStatus } from './process/types';
-import {
-  CloseAction,
-  CompleteAction,
-  HoldAction,
-  InitialTodoAction,
-  ToWorkAction,
-} from './process/actions';
+import { TodoCommand, TodoProcessName, TodoStatus } from './process/types';
+import { InitialTodoAction } from './process/actions';
 import { App } from './app';
 import { TodoTaskRepository } from './services/todo-task-repository';
 import { Todo } from './models';
@@ -27,38 +20,14 @@ export function bootstrapApp() {
     .pipe(
       addActionContext(),
       addInitialAction(InitialTodoAction),
-      addActions<TodoStatus, unknown, TodoCommand>(
-        ['to-work', ToWorkAction],
-        ['close', CloseAction],
-        ['hold', HoldAction],
-        ['complete', CompleteAction]
-      )
+      addActionsFromStore(TodoProcessName)
     )
     .build();
 
   const processManager = createProcessBuilder<TodoStatus, Todo, TodoCommand>(
-    {
-      name: 'todo demo',
-      version: '1.0',
-    },
+    TodoProcessName,
     context
-  ).pipe(
-    addSteps<TodoStatus, unknown, TodoCommand>(
-      'new',
-      'closed',
-      'in-progress',
-      'holding',
-      'completed'
-    ),
-    addRelations<TodoStatus, unknown, TodoCommand>(
-      ['new', 'in-progress', 'to-work'],
-      ['new', 'closed', 'close'],
-      ['in-progress', 'holding', 'hold'],
-      ['holding', 'in-progress', 'to-work'],
-      ['in-progress', 'completed', 'complete'],
-      ['completed', 'closed', 'close']
-    )
-  );
+  ).pipe(addRelationsAndStepsFromStore());
 
   const process = processManager.build(getProcessFactory());
 
