@@ -3,6 +3,10 @@ export interface ProcessName {
   version: string;
 }
 
+export function formatProcessName(process: ProcessName) {
+  return [process.name, process.version].join('_');
+}
+
 export interface ITask<S extends string, P> {
   id: string;
   status: S;
