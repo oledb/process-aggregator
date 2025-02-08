@@ -1,4 +1,9 @@
-import { formatProcessName, IAction, ProcessName } from '../../types';
+import {
+  formatProcessName,
+  IAction,
+  IInitialTaskAction,
+  ProcessName,
+} from '../../types';
 import { Type } from '../../context';
 
 export const actionHasBeenAlreadyAddedToStore = (
@@ -13,7 +18,9 @@ export interface ActionMetadata {
   command: string;
   processName: ProcessName;
   relations: [string, string][];
-  actionType: Type<IAction<string, unknown>>;
+  actionType: Type<
+    IAction<string, unknown> | IInitialTaskAction<string, unknown, unknown>
+  >;
 }
 
 export class GlobalStore {
@@ -45,6 +52,22 @@ export class GlobalStore {
       throw new Error(`Actions for process ${pn} not found`);
     }
     return [...actions.values()];
+  }
+
+  getActionMetadata(
+    command: string,
+    processName: ProcessName
+  ): ActionMetadata | null {
+    const pn = formatProcessName(processName);
+    if (!this.processes.has(pn)) {
+      return null;
+    }
+    const actions = this.processes.get(pn);
+    if (!actions) {
+      throw new Error(`Actions for process ${pn} not found`);
+    }
+
+    return actions.get(command) || null;
   }
 
   clear() {

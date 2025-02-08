@@ -1,12 +1,15 @@
-import { ProcessName } from '../../types';
-import { Action } from './decorators';
+import { INITIAL_ACTION_COMMAND, ProcessName } from '../../types';
+import {
+  Action,
+  InitialAction,
+  initialActionHasAlreadyBeenExist,
+} from './decorators';
 import { ActionMetadata, getGlobalStore } from './global-store';
-import { getFakeAction } from './decorators-spec-utils';
+import { getFakeAction, getFakeInitialAction } from './decorators-spec-utils';
 
 describe('process-manager', () => {
   describe('decorators', () => {
     type FakeStatus = 'active' | 'closed';
-    type FakeCommand = 'close' | 'activate';
     type FakePayload = { todoName: string };
     const processNameV1: ProcessName = { name: 'fake', version: '1.0' };
     const processNameV2: ProcessName = { name: 'fake', version: '2.0' };
@@ -14,7 +17,7 @@ describe('process-manager', () => {
     afterEach(() => getGlobalStore().clear());
 
     it('add @Action decorator to action class', () => {
-      @Action<FakeStatus, FakePayload, FakeCommand>({
+      @Action({
         command: 'close',
         processName: processNameV1,
         relations: [['active', 'closed']],
@@ -34,14 +37,14 @@ describe('process-manager', () => {
     });
 
     it('add @Action decorator to action for different processes', () => {
-      @Action<FakeStatus, FakePayload, FakeCommand>({
+      @Action({
         command: 'close',
         processName: processNameV1,
         relations: [['active', 'closed']],
       })
       class CloseAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
-      @Action<FakeStatus, FakePayload, FakeCommand>({
+      @Action({
         command: 'activate',
         processName: processNameV2,
         relations: [['active', 'closed']],
@@ -75,6 +78,52 @@ describe('process-manager', () => {
       const actionMetadata = getGlobalStore().getActionsMetadata(processNameV1);
 
       expect(actionMetadata).toEqual([]);
+    });
+
+    it('add @InitialAction decorator for action class', () => {
+      @InitialAction({
+        processName: processNameV1,
+      })
+      class TodoInitialAction extends getFakeInitialAction<
+        FakeStatus,
+        FakePayload
+      >() {}
+
+      const initialActionMetadata =
+        getGlobalStore().getActionsMetadata(processNameV1);
+
+      expect(initialActionMetadata).toEqual<ActionMetadata[]>([
+        {
+          command: INITIAL_ACTION_COMMAND,
+          relations: [],
+          processName: processNameV1,
+          actionType: TodoInitialAction,
+        },
+      ]);
+    });
+
+    it('throw error if there are two actions with @InitialAction decorator', () => {
+      @InitialAction({
+        processName: processNameV1,
+      })
+      class TodoInitialAction extends getFakeInitialAction<
+        FakeStatus,
+        FakePayload
+      >() {}
+
+      function createSecondInitialTask() {
+        @InitialAction({
+          processName: processNameV1,
+        })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        class AnotherTodoInitialAction extends getFakeInitialAction<
+          FakeStatus,
+          FakePayload
+        >() {}
+      }
+      expect(() => createSecondInitialTask()).toThrow(
+        initialActionHasAlreadyBeenExist(TodoInitialAction.name)
+      );
     });
   });
 });

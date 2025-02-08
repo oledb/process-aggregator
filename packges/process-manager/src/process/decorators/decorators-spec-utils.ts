@@ -1,4 +1,4 @@
-import { IAction, ITask, ProcessName } from '../../types';
+import { IAction, IInitialTaskAction, ITask, ProcessName } from '../../types';
 
 export function getFakeAction<S extends string, P>() {
   return class implements IAction<S, P> {
@@ -6,6 +6,17 @@ export function getFakeAction<S extends string, P>() {
 
     async updateTask(task: ITask<S, P>): Promise<ITask<S, P>> {
       return task;
+    }
+  };
+}
+
+export function getFakeInitialAction<S extends string, P, IS = P>() {
+  return class implements IInitialTaskAction<S, P, IS> {
+    processName!: ProcessName;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    createTask(initialState: IS): Promise<ITask<S, P>> {
+      throw new Error('Method not implemented.');
     }
   };
 }

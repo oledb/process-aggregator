@@ -23,7 +23,7 @@ describe('process-manager', () => {
       afterEach(() => getGlobalStore().clear());
 
       it('add action to action store', () => {
-        @Action<FakeStatus, FakePayload, FakeCommand>({
+        @Action<FakeStatus, FakeCommand>({
           command: 'activate',
           processName: processNameV1,
         })
@@ -42,7 +42,7 @@ describe('process-manager', () => {
       });
 
       it('ignore action for different process', () => {
-        @Action<FakeStatus, FakePayload, FakeCommand>({
+        @Action<FakeStatus, FakeCommand>({
           command: 'activate',
           processName: processNameV1,
         })
@@ -53,7 +53,7 @@ describe('process-manager', () => {
           name: string;
         }
 
-        @Action<FakeStatus, FakePayload, FakeCommand>({
+        @Action<FakeStatus, FakeCommand>({
           command: 'activate',
           processName: processNameV2,
         })
@@ -86,7 +86,7 @@ describe('process-manager', () => {
       afterEach(() => getGlobalStore().clear());
 
       it('add relations', () => {
-        @Action<FakeStatus, FakePayload, FakeCommand>({
+        @Action<FakeStatus, FakeCommand>({
           command: 'activate',
           processName: processNameV1,
           relations: [['active', 'in-progress']],
@@ -94,7 +94,7 @@ describe('process-manager', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         class ActivateAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
-        @Action<FakeStatus, FakePayload, FakeCommand>({
+        @Action<FakeStatus, FakeCommand>({
           command: 'close',
           processName: processNameV1,
           relations: [['active', 'closed']],
