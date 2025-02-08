@@ -1,17 +1,13 @@
+import { IContext } from '../../context';
 import {
+  ActionContext,
   IInitialTaskAction,
   INITIAL_ACTION_COMMAND,
-  IRelationWeight,
-  IStep,
-  ITask,
-  ProcessName,
-  TaskValidationState,
-} from '../types';
-import { IContext } from '../context';
-import { IProcess, IProcessWritable } from './types';
-import { ActionContext } from './action-context';
-import { ProcessFactory } from './process-builder/process-builder';
-import { GraphProcessor } from '../graph';
+} from '../actions';
+import { ProcessFactory } from '../process-builder';
+import { GraphProcessor } from '../../graph';
+import { IProcess, IProcessWritable, ProcessName } from './types';
+import { IRelationWeight, IStep, ITask, TaskValidationState } from '../common';
 
 export function getProcessFactory<
   S extends string,

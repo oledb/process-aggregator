@@ -1,4 +1,3 @@
-import { ITask, TaskValidationState } from '../../types';
 import {
   getCommandNotFoundErrorMessage,
   getStepNotFoundErrorMessage,
@@ -16,10 +15,11 @@ import {
   createActionValidationError,
   ProcessFakeCreateActionWithoutValidation,
 } from './process-spec-fakes';
-import { deepClone } from '../../utils/types/objects';
-import { addActionContext } from '../action-context';
-import { addInitialAction } from '../process-builder/process-builder';
-import { createContextBuilder } from '../../context';
+import { deepClone } from '../../../utils/types/objects';
+import { addActionContext } from '../../actions';
+import { addInitialAction } from '../../process-builder';
+import { createContextBuilder } from '../../../context';
+import { ITask, TaskValidationState } from '../../common';
 
 describe('process-manager', () => {
   describe('process', () => {

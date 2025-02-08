@@ -11,11 +11,12 @@ import { TodoCommand, TodoProcessName, TodoStatus } from './process/types';
 import { App } from './app';
 import { TodoTaskRepository } from './services/todo-task-repository';
 import { Todo } from './models';
+import * as actions from './process/actions';
 
 export function bootstrapApp() {
   const context = createContextBuilder()
     .pipe(addSingleton(TodoTaskRepository))
-    .pipe(addActionContext(), addActionsFromStore(TodoProcessName))
+    .pipe(addActionContext(), addActionsFromStore(TodoProcessName, actions))
     .build();
 
   const processManager = createProcessBuilder<TodoStatus, Todo, TodoCommand>(

@@ -1,11 +1,14 @@
-import {
-  IRelationWeight,
-  IStep,
-  ITask,
-  ProcessName,
-  TaskValidationState,
-} from '../types';
-import { GraphProcessor } from '../graph';
+import { GraphProcessor } from '../../graph';
+import { IRelationWeight, IStep, ITask, TaskValidationState } from '../common';
+
+export interface ProcessName {
+  name: string;
+  version: string;
+}
+
+export function formatProcessName(process: ProcessName) {
+  return [process.name, process.version].join('_');
+}
 
 export interface IProcess<S extends string, P, C extends string> {
   processName: ProcessName;

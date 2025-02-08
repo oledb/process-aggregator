@@ -1,11 +1,12 @@
-import { INITIAL_ACTION_COMMAND, ProcessName } from '../../types';
 import {
   Action,
   InitialAction,
   initialActionHasAlreadyBeenExist,
 } from './decorators';
-import { ActionMetadata, getGlobalStore } from './global-store';
+import { ActionMetadata, getGlobalStore } from '../common';
 import { getFakeAction, getFakeInitialAction } from './decorators-spec-utils';
+import { ProcessName } from '../process';
+import { INITIAL_ACTION_COMMAND } from './types';
 
 describe('process-manager', () => {
   describe('decorators', () => {

@@ -3,9 +3,13 @@ import {
   IAction,
   IInitialTaskAction,
   INITIAL_ACTION_COMMAND,
+} from '../actions';
+import {
+  IProcess,
+  IProcessWritable,
+  ProcessBuilderOperators,
   ProcessName,
-} from '../../types';
-import { IProcess, IProcessWritable, ProcessBuilderOperators } from '../types';
+} from '../process';
 
 export function addAction<S extends string, P, C extends string>(
   command: C,

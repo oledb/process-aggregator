@@ -1,15 +1,14 @@
-import { ProcessName } from '../../types';
-import { getFakeAction } from '../decorators/decorators-spec-utils';
-import { Action } from '../decorators';
+import { getFakeAction } from './decorators-spec-utils';
 import { createContextBuilder } from '../../context';
 import {
   addActionsFromStore,
   addRelationsAndStepsFromStore,
-} from './action-decorator-operators';
-import { getGlobalStore } from '../decorators/global-store';
-import { createProcessBuilder } from './process-builder';
-import { addActionContext } from '../action-context';
-import { getProcessFactory } from '../process';
+} from './decorator-operators';
+import { getGlobalStore } from '../common';
+import { createProcessBuilder } from '../process-builder';
+import { addActionContext } from './action-context';
+import { getProcessFactory, ProcessName } from '../process';
+import { Action } from './decorators';
 
 describe('process-manager', () => {
   describe('action-decorator-operators', () => {
@@ -32,7 +31,7 @@ describe('process-manager', () => {
         }
 
         const context = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV1))
+          .pipe(addActionsFromStore(processNameV1, {}))
           .build();
 
         const action = context.getService('activate');
@@ -65,11 +64,11 @@ describe('process-manager', () => {
         }
 
         const contextV1 = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV1))
+          .pipe(addActionsFromStore(processNameV1, {}))
           .build();
 
         const contextV2 = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV2))
+          .pipe(addActionsFromStore(processNameV2, {}))
           .build();
 
         const actionV1 = contextV1.getService('activate');
@@ -103,7 +102,7 @@ describe('process-manager', () => {
         class CloseAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
         const context = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV1), addActionContext())
+          .pipe(addActionsFromStore(processNameV1, {}), addActionContext())
           .build();
         const process = createProcessBuilder<
           FakeStatus,

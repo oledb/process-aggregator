@@ -1,7 +1,7 @@
-import { ContextOperator, IContext } from '../context';
-import { IAction } from '../types';
-import { Inject } from '../context';
-import { Context } from '../context/context';
+import { ContextOperator, IContext } from '../../context';
+import { Inject } from '../../context';
+import { Context } from '../../context/context';
+import { IAction } from './types';
 
 export function addActionContext(): ContextOperator {
   return (context) => {

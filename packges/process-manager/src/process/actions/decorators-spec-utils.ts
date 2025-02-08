@@ -1,4 +1,6 @@
-import { IAction, IInitialTaskAction, ITask, ProcessName } from '../../types';
+import { IAction, IInitialTaskAction } from './types';
+import { ProcessName } from '../process';
+import { ITask } from '../common';
 
 export function getFakeAction<S extends string, P>() {
   return class implements IAction<S, P> {

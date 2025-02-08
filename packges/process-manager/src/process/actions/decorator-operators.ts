@@ -1,9 +1,15 @@
 import { ContextOperator } from '../../context';
-import { ProcessName } from '../../types';
-import { getGlobalStore } from '../decorators/global-store';
-import { ProcessBuilderOperators } from '../types';
+import { getGlobalStore } from '../common';
+import { ProcessBuilderOperators, ProcessName } from '../process';
 
-export function addActionsFromStore(processName: ProcessName): ContextOperator {
+export function addActionsFromStore(
+  processName: ProcessName,
+  firstImport: object,
+  ...imports: object[]
+): ContextOperator {
+  if (!Array.isArray(imports) || !firstImport) {
+    throw new Error('Imported actions not found');
+  }
   return (context) => {
     for (const metadata of getGlobalStore().getActionsMetadata(processName)) {
       context.setInstance(metadata.command, metadata.actionType);

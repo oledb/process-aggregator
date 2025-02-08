@@ -1,2 +1,2 @@
 export * from './process-builder';
-export * from './action-decorator-operators';
+export * from '../actions/decorator-operators';

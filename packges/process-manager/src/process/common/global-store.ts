@@ -1,10 +1,6 @@
-import {
-  formatProcessName,
-  IAction,
-  IInitialTaskAction,
-  ProcessName,
-} from '../../types';
 import { Type } from '../../context';
+import { formatProcessName, ProcessName } from '../process';
+import { IAction, IInitialTaskAction } from '../actions';
 
 export const actionHasBeenAlreadyAddedToStore = (
   command: string,

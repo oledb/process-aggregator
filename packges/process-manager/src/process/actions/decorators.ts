@@ -1,11 +1,7 @@
-import {
-  IAction,
-  IInitialTaskAction,
-  INITIAL_ACTION_COMMAND,
-  ProcessName,
-} from '../../types';
 import { Type } from '../../context';
-import { getGlobalStore } from './global-store';
+import { getGlobalStore } from '../common';
+import { ProcessName } from '../process';
+import { IAction, IInitialTaskAction, INITIAL_ACTION_COMMAND } from './types';
 
 export interface ActionDecoratorProperties<S extends string, C extends string> {
   command: C;

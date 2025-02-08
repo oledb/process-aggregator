@@ -1,20 +1,15 @@
 import {
-  IAction,
-  IInitialTaskAction,
-  ITask,
-  ProcessName,
-  TaskValidationState,
-} from '../../types';
-import {
   addActions,
   addInitialAction,
   addRelations,
   addSteps,
   createProcessBuilder,
-} from '../process-builder/process-builder';
-import { addActionContext } from '../action-context';
+} from '../../process-builder';
+import { addActionContext, IAction, IInitialTaskAction } from '../../actions';
 import { getProcessFactory } from '../process';
-import { createContextBuilder, IContext } from '../../context';
+import { createContextBuilder, IContext } from '../../../context';
+import { ProcessName } from '../types';
+import { ITask, TaskValidationState } from '../../common';
 
 export type ProcessFakeStatus = 'new' | 'in-progress' | 'closed';
 export type ProcessFakeCommand = 'to-work' | 'close' | 'review';
