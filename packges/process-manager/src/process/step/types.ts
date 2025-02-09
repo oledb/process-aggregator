@@ -1,4 +1,4 @@
-import { ProcessName } from '../../process';
+import { ProcessName } from '../process';
 
 export interface IStep<S extends string> {
   processName: ProcessName;

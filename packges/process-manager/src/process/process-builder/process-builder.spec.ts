@@ -15,13 +15,9 @@ describe('process-manager', () => {
 
     it('create empty process', () => {
       const context = createContextBuilder().pipe(addActionContext()).build();
-      const process = createProcessBuilder(
-        {
-          name: 'to-do-process',
-          version: '1.0',
-        },
-        context
-      ).build<Process<State, Payload, Command>>(getProcessFactory());
+      const process = createProcessBuilder(processName, context).build<
+        Process<State, Payload, Command>
+      >(getProcessFactory());
 
       expect(process).toBeDefined();
       expect(process.processName).toEqual({ ...processName });
@@ -32,10 +28,7 @@ describe('process-manager', () => {
     it('add steps', () => {
       const context = createContextBuilder().pipe(addActionContext()).build();
       const process = createProcessBuilder<State, Payload, Command>(
-        {
-          name: 'to-do-process',
-          version: '1.0',
-        },
+        processName,
         context
       )
         .pipe(addStep('in-progress'), addStep('closed'))
@@ -57,10 +50,7 @@ describe('process-manager', () => {
     it('add relation', () => {
       const context = createContextBuilder().pipe(addActionContext()).build();
       const process = createProcessBuilder<State, Payload, Command>(
-        {
-          name: 'to-do-process',
-          version: '1.0',
-        },
+        processName,
         context
       )
         .pipe(addStep('in-progress'), addStep('closed'))

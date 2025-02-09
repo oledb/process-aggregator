@@ -1,5 +1,6 @@
 import { GraphProcessor } from '../../graph';
-import { IRelationWeight, IStep, ITask, TaskValidationState } from '../common';
+import { IRelationWeight, ITask, TaskValidationState } from '../common';
+import { IStep } from '../step';
 
 export interface ProcessName {
   name: string;

@@ -7,7 +7,8 @@ import {
 import { ProcessFactory } from '../process-builder';
 import { GraphProcessor } from '../../graph';
 import { IProcess, IProcessWritable, ProcessName } from './types';
-import { IRelationWeight, IStep, ITask, TaskValidationState } from '../common';
+import { IRelationWeight, ITask, TaskValidationState } from '../common';
+import { IStep } from '../step';
 
 export function getProcessFactory<
   S extends string,

@@ -31,7 +31,7 @@ describe('process-manager', () => {
         }
 
         const context = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV1, {}))
+          .pipe(addActionsFromStore(processNameV1))
           .build();
 
         const action = context.getService('activate');
@@ -64,11 +64,11 @@ describe('process-manager', () => {
         }
 
         const contextV1 = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV1, {}))
+          .pipe(addActionsFromStore(processNameV1))
           .build();
 
         const contextV2 = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV2, {}))
+          .pipe(addActionsFromStore(processNameV2))
           .build();
 
         const actionV1 = contextV1.getService('activate');
@@ -102,7 +102,7 @@ describe('process-manager', () => {
         class CloseAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
         const context = createContextBuilder()
-          .pipe(addActionsFromStore(processNameV1, {}), addActionContext())
+          .pipe(addActionsFromStore(processNameV1), addActionContext())
           .build();
         const process = createProcessBuilder<
           FakeStatus,

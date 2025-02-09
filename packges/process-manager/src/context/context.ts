@@ -8,7 +8,10 @@ export const UNKNOWN_ERROR = 'Unknown Error';
 
 export class Context implements IContext, IContextWriteable {
   private readonly singletonTypes = new Set<Type<unknown>>();
-  private readonly singletonInstance = new Map<string | Type<unknown>, unknown>();
+  private readonly singletonInstance = new Map<
+    string | Type<unknown>,
+    unknown
+  >();
   private readonly types = new Map<string | Type<unknown>, unknown>();
 
   constructor() {
@@ -25,6 +28,7 @@ export class Context implements IContext, IContextWriteable {
 
   setInstance<T>(token: string, type: Type<T>): void;
   setInstance<T>(type: Type<T>): void;
+  setInstance<T>(type: Type<T>): void;
   setInstance<T>(token: string | Type<T>, type?: Type<T>): void {
     if (this.types.has(token)) {
       throw new Error(TYPE_EXISTS_ERROR);
@@ -40,23 +44,27 @@ export class Context implements IContext, IContextWriteable {
 
   getService<T>(token: string | Type<T>): T {
     if (isType(token)) {
-      if (this.singletonTypes.has(token)) {
-        if (this.singletonInstance.has(token)) {
-          return this.singletonInstance.get(token) as T;
-        }
-        const instance = this.createTypeFromTypeToken(token);
-        this.singletonInstance.set(token, instance);
-        return instance;
-      }
-      if (!this.types.has(token)) {
-        throw new Error(TYPE_DOES_NOT_EXIST_ERROR);
-      }
-      return this.createTypeFromTypeToken(token);
+      return this.getSingleton(token);
     }
     if (!this.types.has(token)) {
       throw new Error(TYPE_DOES_NOT_EXIST_ERROR);
     }
     return this.createTypeFromStringToken(token);
+  }
+
+  private getSingleton<T>(token: Type<T>) {
+    if (this.singletonTypes.has(token)) {
+      if (this.singletonInstance.has(token)) {
+        return this.singletonInstance.get(token) as T;
+      }
+      const instance = this.createTypeFromTypeToken(token);
+      this.singletonInstance.set(token, instance);
+      return instance;
+    }
+    if (!this.types.has(token)) {
+      throw new Error(TYPE_DOES_NOT_EXIST_ERROR);
+    }
+    return this.createTypeFromTypeToken(token);
   }
 
   private createTypeFromTypeToken<T>(token: Type<T> & InjectedToken) {

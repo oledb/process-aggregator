@@ -2,14 +2,7 @@ import { ContextOperator } from '../../context';
 import { getGlobalStore } from '../common';
 import { ProcessBuilderOperators, ProcessName } from '../process';
 
-export function addActionsFromStore(
-  processName: ProcessName,
-  firstImport: object,
-  ...imports: object[]
-): ContextOperator {
-  if (!Array.isArray(imports) || !firstImport) {
-    throw new Error('Imported actions not found');
-  }
+export function addActionsFromStore(processName: ProcessName): ContextOperator {
   return (context) => {
     for (const metadata of getGlobalStore().getActionsMetadata(processName)) {
       context.setInstance(metadata.command, metadata.actionType);

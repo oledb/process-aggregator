@@ -6,6 +6,7 @@ import {
   createContextBuilder,
   createProcessBuilder,
   getProcessFactory,
+  importFile,
 } from '@process-aggregator/process-manager';
 import { TodoCommand, TodoProcessName, TodoStatus } from './process/types';
 import { App } from './app';
@@ -13,10 +14,12 @@ import { TodoTaskRepository } from './services/todo-task-repository';
 import { Todo } from './models';
 import * as actions from './process/actions';
 
+importFile(actions);
+
 export function bootstrapApp() {
   const context = createContextBuilder()
     .pipe(addSingleton(TodoTaskRepository))
-    .pipe(addActionContext(), addActionsFromStore(TodoProcessName, actions))
+    .pipe(addActionContext(), addActionsFromStore(TodoProcessName))
     .build();
 
   const processManager = createProcessBuilder<TodoStatus, Todo, TodoCommand>(
