@@ -19,7 +19,7 @@ import { deepClone } from '../../../utils/types/objects';
 import { addActionContext } from '../../actions';
 import { addInitialAction } from '../../process-builder';
 import { createContextBuilder } from '../../../context';
-import { ITask, TaskValidationState } from '../../common';
+import { ITask, ValidationState } from '../../common';
 
 describe('process-manager', () => {
   describe('process', () => {
@@ -55,7 +55,7 @@ describe('process-manager', () => {
         );
 
         expect(inProgressValidationStatus).toBeDefined();
-        expect(inProgressValidationStatus).toEqual<TaskValidationState>({
+        expect(inProgressValidationStatus).toEqual<ValidationState>({
           valid: 'true',
         });
       });
@@ -72,7 +72,7 @@ describe('process-manager', () => {
         );
 
         expect(inProgressValidationStatus).toBeDefined();
-        expect(inProgressValidationStatus).toEqual<TaskValidationState>({
+        expect(inProgressValidationStatus).toEqual<ValidationState>({
           valid: 'false',
           errorMessage: closeActionValidationError,
         });
@@ -90,7 +90,7 @@ describe('process-manager', () => {
         );
 
         expect(newTaskValidationStatus).toBeDefined();
-        expect(newTaskValidationStatus).toEqual<TaskValidationState>({
+        expect(newTaskValidationStatus).toEqual<ValidationState>({
           valid: 'true',
         });
       });
@@ -175,7 +175,7 @@ describe('process-manager', () => {
           name: 'test task',
         });
 
-        expect(result).toEqual<TaskValidationState>({ valid: 'true' });
+        expect(result).toEqual<ValidationState>({ valid: 'true' });
       });
 
       it('validate initial command with action method. Return false', async () => {
@@ -185,7 +185,7 @@ describe('process-manager', () => {
           name: '',
         });
 
-        expect(result).toEqual<TaskValidationState>({
+        expect(result).toEqual<ValidationState>({
           valid: 'false',
           errorMessage: createActionValidationError,
         });
@@ -205,7 +205,7 @@ describe('process-manager', () => {
           name: '',
         });
 
-        expect(result).toEqual<TaskValidationState>({ valid: 'true' });
+        expect(result).toEqual<ValidationState>({ valid: 'true' });
       });
 
       it('throw error when no initial action', async () => {

@@ -1,5 +1,5 @@
 import { GraphProcessor } from '../../graph';
-import { IRelationWeight, ITask, TaskValidationState } from '../common';
+import { IRelationWeight, ITask, ValidationState } from '../common';
 import { IStep } from '../step';
 
 export interface ProcessName {
@@ -13,9 +13,9 @@ export function formatProcessName(process: ProcessName) {
 
 export interface IProcess<S extends string, P, C extends string> {
   processName: ProcessName;
-  validateInitialState<IS>(initialState: IS): Promise<TaskValidationState>;
+  validateInitialState<IS>(initialState: IS): Promise<ValidationState>;
   createInitialTask<IS>(initialState: IS): Promise<ITask<S, P>>;
-  validateCommand(command: C, task: ITask<S, P>): Promise<TaskValidationState>;
+  validateCommand(command: C, task: ITask<S, P>): Promise<ValidationState>;
   invokeCommand(command: C, task: ITask<S, P>): Promise<ITask<S, P>>;
   getAvailableStatusCommands(status: S): C[];
 }

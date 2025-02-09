@@ -9,7 +9,7 @@ import { addActionContext, IAction, IInitialTaskAction } from '../../actions';
 import { getProcessFactory } from '../process';
 import { createContextBuilder, IContext } from '../../../context';
 import { ProcessName } from '../types';
-import { ITask, TaskValidationState } from '../../common';
+import { ITask, ValidationState } from '../../common';
 
 export type ProcessFakeStatus = 'new' | 'in-progress' | 'closed';
 export type ProcessFakeCommand = 'to-work' | 'close' | 'review';
@@ -35,7 +35,7 @@ export class ProcessFakeCreateAction
 
   async validateInitialState(
     initialState: ProcessFakePayload
-  ): Promise<TaskValidationState> {
+  ): Promise<ValidationState> {
     return initialState.name
       ? { valid: 'true' }
       : {
@@ -107,7 +107,7 @@ export class ProcessFakeCloseAction
   processName!: ProcessName;
   async validateTask(
     task: ITask<ProcessFakeStatus, ProcessFakePayload>
-  ): Promise<TaskValidationState> {
+  ): Promise<ValidationState> {
     if (!task.payload.result) {
       return {
         valid: 'false',

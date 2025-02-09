@@ -1,6 +1,7 @@
 import { Type } from '../../context';
 import { formatProcessName, ProcessName } from '../process';
 import { IAction, IInitialTaskAction } from '../actions';
+import { IReadOperator, IUpdateOperator } from '../step';
 
 export const actionHasBeenAlreadyAddedToStore = (
   command: string,
@@ -19,16 +20,25 @@ export interface ActionMetadata {
   >;
 }
 
+export interface StepMetadata {
+  updateOperator: Type<IUpdateOperator<string, unknown>> | null;
+  readOperator: Type<IReadOperator<string, unknown>> | null;
+}
+
 export class GlobalStore {
-  private readonly processes = new Map<string, Map<string, ActionMetadata>>();
+  private readonly actionsMetadata = new Map<
+    string,
+    Map<string, ActionMetadata>
+  >();
+  private readonly stepMetadata = new Map<string, Map<string, StepMetadata>>();
 
   setActionMetadata(metadata: ActionMetadata) {
     const { processName, command } = metadata;
     const pn = formatProcessName(processName);
-    if (!this.processes.has(pn)) {
-      this.processes.set(pn, new Map());
+    if (!this.actionsMetadata.has(pn)) {
+      this.actionsMetadata.set(pn, new Map());
     }
-    const actions = this.processes.get(pn);
+    const actions = this.actionsMetadata.get(pn);
     if (!actions) {
       throw new Error(`Actions for process ${pn} not found`);
     }
@@ -40,10 +50,10 @@ export class GlobalStore {
 
   getActionsMetadata(processName: ProcessName): ActionMetadata[] {
     const pn = formatProcessName(processName);
-    if (!this.processes.has(pn)) {
+    if (!this.actionsMetadata.has(pn)) {
       return [];
     }
-    const actions = this.processes.get(pn);
+    const actions = this.actionsMetadata.get(pn);
     if (!actions) {
       throw new Error(`Actions for process ${pn} not found`);
     }
@@ -55,10 +65,10 @@ export class GlobalStore {
     processName: ProcessName
   ): ActionMetadata | null {
     const pn = formatProcessName(processName);
-    if (!this.processes.has(pn)) {
+    if (!this.actionsMetadata.has(pn)) {
       return null;
     }
-    const actions = this.processes.get(pn);
+    const actions = this.actionsMetadata.get(pn);
     if (!actions) {
       throw new Error(`Actions for process ${pn} not found`);
     }
@@ -67,7 +77,29 @@ export class GlobalStore {
   }
 
   clear() {
-    this.processes.clear();
+    this.actionsMetadata.clear();
+    this.stepMetadata.clear();
+  }
+
+  setStepMetadata(
+    status: string,
+    processName: ProcessName,
+    metadata: StepMetadata
+  ) {
+    const pn = formatProcessName(processName);
+    if (!this.actionsMetadata.has(pn)) {
+      this.stepMetadata.set(pn, new Map());
+    }
+    const process = this.stepMetadata.get(pn);
+    process?.set(status, metadata);
+  }
+
+  getStepMetadata(
+    status: string,
+    processName: ProcessName
+  ): StepMetadata | null {
+    const process = this.stepMetadata.get(formatProcessName(processName));
+    return process?.get(status) ?? null;
   }
 }
 

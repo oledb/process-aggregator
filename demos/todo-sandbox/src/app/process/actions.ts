@@ -6,7 +6,7 @@ import {
   Inject,
   ITask,
   ProcessName,
-  TaskValidationState,
+  ValidationState,
 } from '@process-aggregator/process-manager';
 import { TodoCommand, TodoProcessName, TodoStatus } from './types';
 import { NewTodo, Todo } from '../models';
@@ -25,9 +25,7 @@ export class InitialTodoAction
     private readonly todoRepository: TodoTaskRepository
   ) {}
 
-  async validateInitialState?(
-    initialState: NewTodo
-  ): Promise<TaskValidationState> {
+  async validateInitialState?(initialState: NewTodo): Promise<ValidationState> {
     const errorFields: string[] = [];
     if (!initialState.name) {
       errorFields.push('"name" is empty.');

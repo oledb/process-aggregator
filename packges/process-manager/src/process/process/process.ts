@@ -7,7 +7,7 @@ import {
 import { ProcessFactory } from '../process-builder';
 import { GraphProcessor } from '../../graph';
 import { IProcess, IProcessWritable, ProcessName } from './types';
-import { IRelationWeight, ITask, TaskValidationState } from '../common';
+import { IRelationWeight, ITask, ValidationState } from '../common';
 import { IStep } from '../step';
 
 export function getProcessFactory<
@@ -46,9 +46,7 @@ export class Process<S extends string, P, C extends string>
     this.graph.addEdge(fromStep.value, toStep.value, { command });
   }
 
-  async validateInitialState<IS>(
-    initialState: IS
-  ): Promise<TaskValidationState> {
+  async validateInitialState<IS>(initialState: IS): Promise<ValidationState> {
     let initialAction: IInitialTaskAction<S, P, IS> | null = null;
     try {
       initialAction = this.actionContext.getAction(
@@ -81,7 +79,7 @@ export class Process<S extends string, P, C extends string>
   async validateCommand(
     command: C,
     task: ITask<S, P>
-  ): Promise<TaskValidationState> {
+  ): Promise<ValidationState> {
     const weight = this.graph.searchEdges((e) => e.command === command)[0];
     if (!weight) {
       throw new Error(getCommandNotFoundErrorMessage(command));
