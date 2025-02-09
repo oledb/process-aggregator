@@ -1,4 +1,4 @@
-import { getFakeAction } from './decorators-spec-utils';
+import { getFakeAction } from './spec-utils';
 import { createContextBuilder } from '../../context';
 import {
   addActionsFromStore,

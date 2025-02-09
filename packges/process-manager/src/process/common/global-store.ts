@@ -101,6 +101,11 @@ export class GlobalStore {
     const process = this.stepMetadata.get(formatProcessName(processName));
     return process?.get(status) ?? null;
   }
+
+  getStepsMetadata(processName: ProcessName) {
+    const process = this.stepMetadata.get(formatProcessName(processName));
+    return [...(process?.entries() || [])];
+  }
 }
 
 export const GLOBAL_STORE_PROPERTY_NAME = Symbol('Global store property name');

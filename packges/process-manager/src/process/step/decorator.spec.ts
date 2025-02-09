@@ -1,12 +1,7 @@
-import {
-  getGlobalStore,
-  ITask,
-  StepMetadata,
-  ValidationState,
-} from '../common';
+import { getGlobalStore, StepMetadata } from '../common';
 import { classWithStatusAlreadyExist, Step } from './decorator';
 import { ProcessName } from '../process';
-import { IReadOperator, IUpdateOperator } from './types';
+import { getFakeReadOperator, getFakeUpdateOperator } from './spec-utils';
 
 describe('process-manager', () => {
   describe('step', () => {
@@ -20,24 +15,6 @@ describe('process-manager', () => {
         name: 'fake process',
         version: '2.0',
       };
-
-      function getFakeReadOperator() {
-        return class implements IReadOperator<FakeStatus, unknown> {
-          isOperationValid(
-            task: ITask<FakeStatus, unknown>
-          ): Promise<ValidationState> {
-            throw new Error('Method not implemented.');
-          }
-        };
-      }
-
-      function getFakeUpdateOperator() {
-        return class implements IUpdateOperator<FakeStatus, unknown> {
-          updateTaskPayload(taskId: string, payload: unknown): Promise<void> {
-            return Promise.resolve();
-          }
-        };
-      }
 
       afterEach(() => getGlobalStore().clear());
 

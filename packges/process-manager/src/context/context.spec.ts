@@ -19,6 +19,12 @@ describe('process-manager', () => {
       expect(tempContext === context).toEqual(true);
     });
 
+    it('try get service', () => {
+      const context = new Context();
+
+      expect(context.tryGetService('my-token')).toBeNull();
+    });
+
     describe('singletons', () => {
       it('get singleton service', () => {
         const context = new Context();

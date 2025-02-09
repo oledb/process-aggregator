@@ -52,6 +52,14 @@ export class Context implements IContext, IContextWriteable {
     return this.createTypeFromStringToken(token);
   }
 
+  tryGetService<T>(token: string | Type<T>): T | null {
+    try {
+      return this.getService(token);
+    } catch {
+      return null;
+    }
+  }
+
   private getSingleton<T>(token: Type<T>) {
     if (this.singletonTypes.has(token)) {
       if (this.singletonInstance.has(token)) {
