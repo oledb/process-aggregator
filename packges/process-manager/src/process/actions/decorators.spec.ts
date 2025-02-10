@@ -4,7 +4,7 @@ import {
   initialActionHasAlreadyBeenExist,
 } from './decorators';
 import { ActionMetadata, getGlobalStore } from '../common';
-import { getFakeAction, getFakeInitialAction } from './spec-utils';
+import { getFakeAction, getFakeInitialAction } from './spec-fakes';
 import { ProcessName } from '../process';
 import { INITIAL_ACTION_COMMAND } from './types';
 

@@ -1,8 +1,10 @@
 import {
-  getCommandNotFoundErrorMessage,
-  getStepNotFoundErrorMessage,
+  commandNotFound,
+  stepNotFound,
   INITIAL_COMMAND_NOT_FOUND,
-} from '../process';
+  Process,
+  updateMethodNotImplemented,
+} from './process';
 import {
   bootstrapEmptyFakeProcess,
   bootstrapFakeProcess,
@@ -14,12 +16,27 @@ import {
   bootstrapEmptyFakeContext,
   createActionValidationError,
   ProcessFakeCreateActionWithoutValidation,
-} from './process-spec-fakes';
-import { deepClone } from '../../../utils/types/objects';
-import { addActionContext } from '../../actions';
-import { addInitialAction } from '../../process-builder';
-import { createContextBuilder } from '../../../context';
-import { ITask, ValidationState } from '../../common';
+  bootstrapFakeContext,
+} from './spec-fakes';
+import { deepClone } from '../../utils/types/objects';
+import { addActionContext } from '../actions';
+import { addInitialAction } from '../process-builder';
+import { createContextBuilder, IContext } from '../../context';
+import {
+  getGlobalStore,
+  IRelationWeight,
+  ITask,
+  ValidationState,
+} from '../common';
+import {
+  addStepOperatorsFromStore,
+  IReadOperator,
+  IStep,
+  IUpdateOperator,
+  Step,
+} from '../step';
+import { GraphEdge } from '../../graph';
+import { IProcess } from './types';
 
 describe('process-manager', () => {
   describe('process', () => {
@@ -42,6 +59,80 @@ describe('process-manager', () => {
           result: 'test result',
         },
       };
+
+    describe('addStep', () => {
+      it('add step to process', () => {
+        const context = createContextBuilder().pipe(addActionContext()).build();
+        const process = new Process(FAKE_PROCESS_NAME, context);
+
+        process.addStep('active');
+
+        const [node] = process.graph.searchNodes((n) => n.status === 'active');
+
+        expect(node).toBeDefined();
+        expect(node.value).toEqual<IStep<string>>({
+          processName: FAKE_PROCESS_NAME,
+          status: 'active',
+        });
+      });
+    });
+
+    describe('addRelation', () => {
+      let context!: IContext;
+      let process!: Process<string, unknown, string>;
+
+      beforeEach(() => {
+        context = createContextBuilder().pipe(addActionContext()).build();
+        process = new Process(FAKE_PROCESS_NAME, context);
+      });
+
+      it('add relation to process', () => {
+        process.addStep('new');
+        process.addStep('active');
+        process.addRelation('new', 'active', 'activate');
+
+        const [edge] = process.graph.searchEdges(
+          (e) => e.command === 'activate'
+        );
+
+        expect(edge).toBeDefined();
+        expect(edge).toEqual<GraphEdge<IRelationWeight<string>>>({
+          start: 0,
+          end: 1,
+          weight: {
+            command: 'activate',
+          },
+        });
+      });
+
+      it('throw an error if there is no start step', () => {
+        process.addStep('active');
+
+        expect(() => process.addRelation('new', 'active', 'activate')).toThrow(
+          stepNotFound('new')
+        );
+
+        const [edge] = process.graph.searchEdges(
+          (e) => e.command === 'activate'
+        );
+
+        expect(edge).toBeUndefined();
+      });
+
+      it('throw an error if there is no end step', () => {
+        process.addStep('new');
+
+        expect(() => process.addRelation('new', 'active', 'activate')).toThrow(
+          stepNotFound('active')
+        );
+
+        const [edge] = process.graph.searchEdges(
+          (e) => e.command === 'activate'
+        );
+
+        expect(edge).toBeUndefined();
+      });
+    });
 
     describe('validateCommand', () => {
       it('validate command with action method. Return true', async () => {
@@ -102,7 +193,7 @@ describe('process-manager', () => {
 
         await expect(() =>
           process.validateCommand('to-work', newTask)
-        ).rejects.toThrow(getCommandNotFoundErrorMessage('to-work'));
+        ).rejects.toThrow(commandNotFound('to-work'));
       });
 
       it('validation failed for incorrect task', async () => {
@@ -138,7 +229,7 @@ describe('process-manager', () => {
 
         expect(() =>
           process.validateCommand('review', newTask)
-        ).rejects.toThrow(getCommandNotFoundErrorMessage('review'));
+        ).rejects.toThrow(commandNotFound('review'));
       });
     });
 
@@ -256,7 +347,7 @@ describe('process-manager', () => {
         };
 
         expect(() => process.invokeCommand('review', newTask)).rejects.toThrow(
-          getCommandNotFoundErrorMessage('review')
+          commandNotFound('review')
         );
       });
     });
@@ -288,8 +379,183 @@ describe('process-manager', () => {
         const process = bootstrapEmptyFakeProcess();
 
         expect(() => process.getAvailableStatusCommands('new')).toThrow(
-          getStepNotFoundErrorMessage('new')
+          stepNotFound('new')
         );
+      });
+    });
+
+    let process!: IProcess<
+      ProcessFakeStatus,
+      ProcessFakePayload,
+      ProcessFakeCommand
+    >;
+
+    describe('validateReadOperation', () => {
+      const taskInvalidReadingState: ValidationState = {
+        valid: 'false',
+        errorMessage: 'Task is hidden for reading',
+      };
+
+      beforeEach(() => {
+        process = bootstrapFakeProcess(
+          bootstrapFakeContext((c) => {
+            class InProgressReadOperation
+              implements IReadOperator<ProcessFakeStatus, ProcessFakePayload>
+            {
+              async isOperationValid(
+                task: ITask<ProcessFakeStatus, ProcessFakePayload>
+              ): Promise<ValidationState> {
+                return task.payload.name.startsWith('Hidden')
+                  ? taskInvalidReadingState
+                  : { valid: 'true' };
+              }
+            }
+
+            @Step<ProcessFakeStatus, ProcessFakePayload>({
+              status: 'in-progress',
+              processName: FAKE_PROCESS_NAME,
+              readOperator: InProgressReadOperation,
+            })
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            class InProgressStep {}
+
+            return addStepOperatorsFromStore(FAKE_PROCESS_NAME)(c);
+          })
+        );
+      });
+
+      afterEach(() => getGlobalStore().clear());
+
+      it('return valid status', async () => {
+        const state = await process.validateReadOperation({
+          id: '123',
+          status: 'in-progress',
+          payload: { name: 'Hello task' },
+          processName: FAKE_PROCESS_NAME,
+        });
+
+        expect(state).toEqual<ValidationState>({ valid: 'true' });
+      });
+
+      it('return invalid status', async () => {
+        const state = await process.validateReadOperation({
+          id: '123',
+          status: 'in-progress',
+          payload: { name: 'Hidden task' },
+          processName: FAKE_PROCESS_NAME,
+        });
+
+        expect(state).toEqual<ValidationState>(taskInvalidReadingState);
+      });
+    });
+
+    describe('methods of IUpdateOperator', () => {
+      const taskInvalidUpdatingState: ValidationState = {
+        valid: 'false',
+        errorMessage: 'Task is hidden for reading',
+      };
+
+      beforeEach(() => {
+        process = bootstrapFakeProcess(
+          bootstrapFakeContext((c) => {
+            class InProgressUpdateOperation
+              implements IUpdateOperator<ProcessFakeStatus, ProcessFakePayload>
+            {
+              async isOperationValid(
+                task: ITask<ProcessFakeStatus, ProcessFakePayload>
+              ): Promise<ValidationState> {
+                return task.payload.name.startsWith('Hidden')
+                  ? taskInvalidUpdatingState
+                  : { valid: 'true' };
+              }
+              async updateTask(
+                task: ITask<ProcessFakeStatus, ProcessFakePayload>,
+                payload: ProcessFakePayload
+              ): Promise<ITask<ProcessFakeStatus, ProcessFakePayload>> {
+                return {
+                  ...task,
+                  payload: {
+                    ...payload,
+                  },
+                };
+              }
+            }
+
+            @Step<ProcessFakeStatus, ProcessFakePayload>({
+              status: 'in-progress',
+              processName: FAKE_PROCESS_NAME,
+              updateOperator: InProgressUpdateOperation,
+            })
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            class InProgressStep {}
+
+            return addStepOperatorsFromStore(FAKE_PROCESS_NAME)(c);
+          })
+        );
+      });
+
+      afterEach(() => getGlobalStore().clear());
+
+      describe('validateUpdateOperation', () => {
+        it('return valid operation', async () => {
+          const state = await process.validateUpdateOperation({
+            id: '123',
+            status: 'in-progress',
+            payload: { name: 'Hello task' },
+            processName: FAKE_PROCESS_NAME,
+          });
+
+          expect(state).toEqual<ValidationState>({ valid: 'true' });
+        });
+
+        it('return invalid operation', async () => {
+          const state = await process.validateUpdateOperation({
+            id: '123',
+            status: 'in-progress',
+            payload: { name: 'Hidden Hello task' },
+            processName: FAKE_PROCESS_NAME,
+          });
+
+          expect(state).toEqual<ValidationState>(taskInvalidUpdatingState);
+        });
+      });
+
+      describe('updateTask', () => {
+        it('update task with new payload', async () => {
+          const task: ITask<ProcessFakeStatus, ProcessFakePayload> = {
+            id: '123',
+            status: 'in-progress',
+            payload: { name: 'My Taks 1' },
+            processName: FAKE_PROCESS_NAME,
+          };
+          const payload: ProcessFakePayload = { name: 'My Task 1' };
+
+          const newTask = await process.updateTask(task, payload);
+
+          expect(newTask).toBeDefined();
+          expect(newTask).toEqual<ITask<ProcessFakeStatus, ProcessFakePayload>>(
+            {
+              id: '123',
+              status: 'in-progress',
+              payload: { name: 'My Task 1' },
+              processName: FAKE_PROCESS_NAME,
+            }
+          );
+        });
+
+        it('throw error if the update method is not implemented', async () => {
+          const task: ITask<ProcessFakeStatus, ProcessFakePayload> = {
+            id: '123',
+            status: 'closed',
+            payload: { name: 'My Taks 1' },
+            processName: FAKE_PROCESS_NAME,
+          };
+          const payload: ProcessFakePayload = { name: 'My Task 1' };
+
+          await expect(() => process.updateTask(task, payload)).rejects.toThrow(
+            updateMethodNotImplemented('closed')
+          );
+        });
       });
     });
   });

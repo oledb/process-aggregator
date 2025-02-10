@@ -1,4 +1,4 @@
-import { getFakeAction } from './spec-utils';
+import { getFakeAction } from './spec-fakes';
 import { createContextBuilder } from '../../context';
 import {
   addActionsFromStore,

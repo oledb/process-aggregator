@@ -18,6 +18,9 @@ export interface IProcess<S extends string, P, C extends string> {
   validateCommand(command: C, task: ITask<S, P>): Promise<ValidationState>;
   invokeCommand(command: C, task: ITask<S, P>): Promise<ITask<S, P>>;
   getAvailableStatusCommands(status: S): C[];
+  validateUpdateOperation(task: ITask<S, P>): Promise<ValidationState>;
+  updateTask(task: ITask<S, P>, payload: P): Promise<ITask<S, P>>;
+  validateReadOperation(task: ITask<S, P>): Promise<ValidationState>;
 }
 
 export interface IProcessWritable<S extends string, P, C extends string> {

@@ -8,7 +8,7 @@ export interface IStep<S extends string> {
 
 export interface IUpdateOperator<S extends string, P> {
   isOperationValid?(task: ITask<S, P>): Promise<ValidationState>;
-  updateTaskPayload(taskId: string, payload: P): Promise<void>;
+  updateTask(task: ITask<S, P>, payload: P): Promise<ITask<S, P>>;
 }
 
 export interface IReadOperator<S extends string, P> {

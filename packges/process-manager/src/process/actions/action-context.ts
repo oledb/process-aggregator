@@ -10,6 +10,7 @@ export function addActionContext(): ContextOperator {
   };
 }
 
+/** @deprecated - move ActionContext logic to Process class */
 export class ActionContext<S extends string, P, C extends string> {
   constructor(@Inject(Context) private context: IContext) {}
 

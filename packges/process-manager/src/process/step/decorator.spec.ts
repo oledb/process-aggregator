@@ -1,7 +1,7 @@
 import { getGlobalStore, StepMetadata } from '../common';
 import { classWithStatusAlreadyExist, Step } from './decorator';
 import { ProcessName } from '../process';
-import { getFakeReadOperator, getFakeUpdateOperator } from './spec-utils';
+import { getFakeReadOperator, getFakeUpdateOperator } from './spec-fakes';
 
 describe('process-manager', () => {
   describe('step', () => {
@@ -62,7 +62,10 @@ describe('process-manager', () => {
       });
 
       it('gets UpdateOperator from globalStore', () => {
-        class FakeUpdateOperator extends getFakeUpdateOperator() {}
+        class FakeUpdateOperator extends getFakeUpdateOperator<
+          FakeStatus,
+          unknown
+        >() {}
 
         @Step<FakeStatus>({
           processName: processNameV1,

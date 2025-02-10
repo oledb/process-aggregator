@@ -4,12 +4,12 @@ import {
   addRelations,
   addSteps,
   createProcessBuilder,
-} from '../../process-builder';
-import { addActionContext, IAction, IInitialTaskAction } from '../../actions';
-import { getProcessFactory } from '../process';
-import { createContextBuilder, IContext } from '../../../context';
-import { ProcessName } from '../types';
-import { ITask, ValidationState } from '../../common';
+} from '../process-builder';
+import { addActionContext, IAction, IInitialTaskAction } from '../actions';
+import { getProcessFactory } from './process';
+import { ContextOperator, createContextBuilder, IContext } from '../../context';
+import { ProcessName } from './types';
+import { ITask, ValidationState } from '../common';
 
 export type ProcessFakeStatus = 'new' | 'in-progress' | 'closed';
 export type ProcessFakeCommand = 'to-work' | 'close' | 'review';
@@ -129,14 +129,15 @@ export class ProcessFakeCloseAction
   }
 }
 
-export function bootstrapFakeContext() {
+export function bootstrapFakeContext(operator: ContextOperator = (c) => c) {
   return createContextBuilder()
     .pipe(
       addInitialAction(ProcessFakeCreateAction),
       addActions<ProcessFakeStatus, ProcessFakePayload, ProcessFakeCommand>(
         ['to-work', ProcessFakeToWorkAction],
         ['close', ProcessFakeCloseAction]
-      )
+      ),
+      operator
     )
     .pipe(addActionContext())
     .build();
