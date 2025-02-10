@@ -30,7 +30,7 @@ export class App {
     );
     if (!availableCommands.includes(command)) {
       throw new Error(
-        getCommandValidationFailedError(command, COMMAND_NOT_AVAILABLE)
+        getCommandValidationFailedError(command, COMMAND_IS_NOT_AVAILABLE)
       );
     }
     const validationResult = await this.process.validateCommand(command, task);
@@ -52,15 +52,30 @@ export class App {
   }
 
   async getTasks() {
+    // TODO add bulk read
     return this.taskRepository.getTasks();
   }
 
-  async getTask(id: string) {
-    return this.taskRepository.getTask(id);
+  async getTask(taskId: string) {
+    const task = await this.taskRepository.getTask(taskId);
+    const validateState = await this.process.validateReadOperation(task);
+    if (validateState.valid === 'false') {
+      throw new Error(validateState.errorMessage ?? 'Error');
+    }
+    return this.taskRepository.getTask(taskId);
+  }
+
+  async updateTask(taskId: string, payload: Todo) {
+    const task = await this.taskRepository.getTask(taskId);
+    const validationState = await this.process.validateUpdateOperation(task);
+    if (validationState.valid === 'true') {
+      return this.process.updateTask(task, payload);
+    }
+    throw new Error(validationState.errorMessage ?? 'Error');
   }
 }
 
-export const COMMAND_NOT_AVAILABLE = 'Command not available';
+export const COMMAND_IS_NOT_AVAILABLE = 'Command is not available';
 
 export const getCommandValidationFailedError = (
   command: string,

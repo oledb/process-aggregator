@@ -87,7 +87,7 @@ export class GlobalStore {
     metadata: StepMetadata
   ) {
     const pn = formatProcessName(processName);
-    if (!this.actionsMetadata.has(pn)) {
+    if (!this.stepMetadata.has(pn)) {
       this.stepMetadata.set(pn, new Map());
     }
     const process = this.stepMetadata.get(pn);

@@ -8,7 +8,7 @@ export type TodoStatus =
   | 'completed'
   | 'closed';
 
-export const TodoProcessName: ProcessName = {
+export const TODO_PROCESS_NAME: ProcessName = {
   name: 'todo demo',
   version: '1.0',
 };

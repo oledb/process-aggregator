@@ -8,12 +8,12 @@ import {
   ProcessName,
   ValidationState,
 } from '@process-aggregator/process-manager';
-import { TodoCommand, TodoProcessName, TodoStatus } from './types';
+import { TodoCommand, TODO_PROCESS_NAME, TodoStatus } from './types';
 import { NewTodo, Todo } from '../models';
 import { TodoTaskRepository } from '../services/todo-task-repository';
 
 @InitialAction({
-  processName: TodoProcessName,
+  processName: TODO_PROCESS_NAME,
 })
 export class InitialTodoAction
   implements IInitialTaskAction<TodoStatus, Todo, NewTodo>
@@ -61,7 +61,7 @@ export class InitialTodoAction
 
 @Action<TodoStatus, TodoCommand>({
   command: 'to-work',
-  processName: TodoProcessName,
+  processName: TODO_PROCESS_NAME,
   relations: [
     ['new', 'in-progress'],
     ['holding', 'in-progress'],
@@ -88,7 +88,7 @@ export class ToWorkAction implements IAction<TodoStatus, Todo> {
 
 @Action<TodoStatus, TodoCommand>({
   command: 'hold',
-  processName: TodoProcessName,
+  processName: TODO_PROCESS_NAME,
   relations: [['in-progress', 'holding']],
 })
 export class HoldAction implements IAction<TodoStatus, Todo> {
@@ -112,7 +112,7 @@ export class HoldAction implements IAction<TodoStatus, Todo> {
 
 @Action<TodoStatus, TodoCommand>({
   command: 'complete',
-  processName: TodoProcessName,
+  processName: TODO_PROCESS_NAME,
   relations: [['in-progress', 'completed']],
 })
 export class CompleteAction implements IAction<TodoStatus, Todo> {
@@ -136,7 +136,7 @@ export class CompleteAction implements IAction<TodoStatus, Todo> {
 
 @Action<TodoStatus, TodoCommand>({
   command: 'close',
-  processName: TodoProcessName,
+  processName: TODO_PROCESS_NAME,
   relations: [
     ['new', 'closed'],
     ['completed', 'closed'],

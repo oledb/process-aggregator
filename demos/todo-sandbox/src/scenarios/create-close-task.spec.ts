@@ -1,10 +1,11 @@
 import { bootstrapApp } from '../app/bootstrap-app';
-import { NewTodo } from '../app/models';
+import { NewTodo, Todo } from '../app';
 import { TodoCommand } from '../app/process/types';
 import { TodoStatus } from '../app/process/types';
 import { startWithRegExp } from '@process-aggregator/process-manager';
 import { getCommandValidationFailedError } from '../app/app';
-import { COMMAND_NOT_AVAILABLE } from '../app/app';
+import { COMMAND_IS_NOT_AVAILABLE } from '../app/app';
+import { readIsProhibited, updatingIsProhibited } from '../app/process/steps';
 
 describe('todo-sandbox', () => {
   const app = bootstrapApp();
@@ -29,9 +30,9 @@ describe('todo-sandbox', () => {
 
   let essayTaskId = '';
 
-  async function itCreateEssayTask() {
+  async function itCreatesEssayTaskWithIncorrectName() {
     const newTodo: NewTodo = {
-      name: 'Write essay',
+      name: 'Write essy',
       text: 'Essay size is about 5000 chars without spaces',
     };
 
@@ -44,7 +45,7 @@ describe('todo-sandbox', () => {
     expect(taskFromRepository).toEqual(taskCreated);
   }
 
-  async function itMoveEssayTaskToWork() {
+  async function itMovesEssayTaskToWork() {
     let task = await app.getTask(essayTaskId);
     expect(task.status).toEqual('new');
 
@@ -58,17 +59,30 @@ describe('todo-sandbox', () => {
     expect(inProgressTask).toEqual(task);
   }
 
-  async function itMoveEssayTaskToWorkAgainAndGetError() {
+  async function itUpdatesEssayTaskName() {
+    let fixedTodo = (await app.getTask(essayTaskId)).payload;
+    fixedTodo = {
+      ...fixedTodo,
+      name: 'Write essay',
+    };
+    const result = await app.updateTask(essayTaskId, fixedTodo);
+    const essayTask = await app.getTask(essayTaskId);
+
+    expect(result.payload.name).toEqual('Write essay');
+    expect(essayTask.payload.name).toEqual('Write essay');
+  }
+
+  async function itMovesEssayTaskToWorkAgainAndGetError() {
     await expect(() =>
       app.invokeCommand(essayTaskId, 'to-work')
     ).rejects.toThrow(
       startWithRegExp(
-        getCommandValidationFailedError('to-work', COMMAND_NOT_AVAILABLE)
+        getCommandValidationFailedError('to-work', COMMAND_IS_NOT_AVAILABLE)
       )
     );
   }
 
-  async function itMoveEssayTaskToHold() {
+  async function itMovesEssayTaskToHold() {
     let task = await app.getTask(essayTaskId);
     expect(task.status).toEqual<TodoStatus>('in-progress');
 
@@ -82,7 +96,7 @@ describe('todo-sandbox', () => {
     expect(holdingTask).toEqual(task);
   }
 
-  async function itMoveEssayTaskFromHoldingToWorking() {
+  async function itMovesEssayTaskFromHoldingToWorking() {
     let task = await app.getTask(essayTaskId);
     expect(task.status).toEqual<TodoStatus>('holding');
 
@@ -98,7 +112,7 @@ describe('todo-sandbox', () => {
 
   let textbookTaskId = '';
 
-  async function itCreateTextbookTask() {
+  async function itCreatesTextbookTask() {
     const newTodo: NewTodo = {
       name: 'Read the textbook',
       text: 'Read 20 pages a day',
@@ -113,7 +127,7 @@ describe('todo-sandbox', () => {
     expect(taskFromRepository).toEqual(taskCreated);
   }
 
-  async function itCloseTextbookTask() {
+  async function itClosesTextbookTask() {
     let task = await app.getTask(textbookTaskId);
     expect(task.status).toEqual<TodoStatus>('new');
 
@@ -121,29 +135,22 @@ describe('todo-sandbox', () => {
     expect(commands).toEqual<TodoCommand[]>(['to-work', 'close']);
 
     task = await app.invokeCommand(textbookTaskId, 'close');
-    const closedTask = await app.getTask(textbookTaskId);
 
     expect(task.status).toEqual<TodoStatus>('closed');
-    expect(closedTask).toEqual(task);
   }
 
-  async function itInvokeIncorrectCommandForTextbookTask() {
-    const task = await app.getTask(textbookTaskId);
-    expect(task.status).toEqual<TodoStatus>('closed');
-
+  async function itInvokesIncorrectCommandForTextbookTask() {
     const commands = await app.getTaskCommands(textbookTaskId);
     expect(commands).toEqual<TodoCommand[]>([]);
 
     await expect(() =>
       app.invokeCommand(textbookTaskId, 'to-work')
-    ).rejects.toThrow();
-    const closedTask = await app.getTask(textbookTaskId);
-
-    expect(task.status).toEqual<TodoStatus>('closed');
-    expect(closedTask).toEqual(task);
+    ).rejects.toThrow(
+      getCommandValidationFailedError('to-work', COMMAND_IS_NOT_AVAILABLE)
+    );
   }
 
-  async function itMoveEssayTaskToCompleteStatus() {
+  async function itMovesEssayTaskToCompleteStatus() {
     let task = await app.getTask(essayTaskId);
     expect(task.status).toEqual<TodoStatus>('in-progress');
 
@@ -157,7 +164,7 @@ describe('todo-sandbox', () => {
     expect(completedTask).toEqual(task);
   }
 
-  async function itMoveEssayTaskToClosedStatus() {
+  async function itMovesEssayTaskToClosedStatus() {
     let task = await app.getTask(essayTaskId);
     expect(task.status).toEqual<TodoStatus>('completed');
 
@@ -165,24 +172,45 @@ describe('todo-sandbox', () => {
     expect(commands).toEqual<TodoCommand[]>(['close']);
 
     task = await app.invokeCommand(essayTaskId, 'close');
-    const closedTask = await app.getTask(essayTaskId);
 
     expect(task.status).toEqual<TodoStatus>('closed');
-    expect(closedTask).toEqual(task);
+  }
+
+  async function itTriesToUpdateEssayTask() {
+    const fixedTodo: Todo = {
+      name: '[Failed] Write essay',
+      text: '=(',
+      workStared: new Date(),
+      created: new Date(),
+      priority: 'medium',
+    };
+
+    await expect(() => app.updateTask(essayTaskId, fixedTodo)).rejects.toThrow(
+      updatingIsProhibited('closed')
+    );
+  }
+
+  async function itTriesToReadEssayTask() {
+    await expect(() => app.getTask(essayTaskId)).rejects.toThrow(
+      readIsProhibited('closed')
+    );
   }
 
   it('create-close-task scenario', async () => {
     await itChecksTasksIsEmpty();
     await itFailedToCreateEssayTask();
-    await itCreateEssayTask();
-    await itMoveEssayTaskToWork();
-    await itMoveEssayTaskToWorkAgainAndGetError();
-    await itMoveEssayTaskToHold();
-    await itMoveEssayTaskFromHoldingToWorking();
-    await itCreateTextbookTask();
-    await itCloseTextbookTask();
-    await itInvokeIncorrectCommandForTextbookTask();
-    await itMoveEssayTaskToCompleteStatus();
-    await itMoveEssayTaskToClosedStatus();
+    await itCreatesEssayTaskWithIncorrectName();
+    await itUpdatesEssayTaskName();
+    await itMovesEssayTaskToWork();
+    await itMovesEssayTaskToWorkAgainAndGetError();
+    await itMovesEssayTaskToHold();
+    await itMovesEssayTaskFromHoldingToWorking();
+    await itCreatesTextbookTask();
+    await itClosesTextbookTask();
+    await itInvokesIncorrectCommandForTextbookTask();
+    await itMovesEssayTaskToCompleteStatus();
+    await itMovesEssayTaskToClosedStatus();
+    await itTriesToUpdateEssayTask();
+    await itTriesToReadEssayTask();
   });
 });

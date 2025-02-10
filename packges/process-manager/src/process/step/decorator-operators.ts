@@ -7,7 +7,7 @@ export function getUpdateOperatorName(status: string) {
 }
 
 export function getReadOperatorName(status: string) {
-  return `*&${status}_update_operator&*`;
+  return `*&${status}_read_operator&*`;
 }
 
 export function addStepOperatorsFromStore(

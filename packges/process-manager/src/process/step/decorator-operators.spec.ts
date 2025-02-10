@@ -4,6 +4,7 @@ import { ProcessName } from '../process';
 import { createContextBuilder } from '../../context';
 import {
   addStepOperatorsFromStore,
+  getReadOperatorName,
   getUpdateOperatorName,
 } from './decorator-operators';
 import { getGlobalStore } from '../common';
@@ -54,10 +55,39 @@ describe('process-manager', () => {
           .pipe(addStepOperatorsFromStore(processName))
           .build();
 
-        const read = context.getService(getUpdateOperatorName('closed'));
+        const read = context.getService(getReadOperatorName('closed'));
 
         expect(read).toBeDefined();
         expect(read instanceof ReadOperator).toBeTruthy();
+      });
+
+      it('add both read and update operator to Context', () => {
+        class ReadOperator extends getFakeReadOperator<'closed', unknown>() {}
+        class UpdateOperator extends getFakeUpdateOperator<
+          'closed',
+          unknown
+        >() {}
+
+        @Step<'closed'>({
+          processName,
+          status: 'closed',
+          readOperator: ReadOperator,
+          updateOperator: UpdateOperator,
+        })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        class ClosedStep {}
+
+        const context = createContextBuilder()
+          .pipe(addStepOperatorsFromStore(processName))
+          .build();
+
+        const read = context.getService(getReadOperatorName('closed'));
+        const update = context.getService(getUpdateOperatorName('closed'));
+
+        expect(read).toBeDefined();
+        expect(read instanceof ReadOperator).toBeTruthy();
+        expect(update).toBeDefined();
+        expect(update instanceof UpdateOperator).toBeTruthy();
       });
     });
   });

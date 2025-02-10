@@ -133,7 +133,7 @@ export class Process<S extends string, P, C extends string>
     const updateOperator = this.context.tryGetService<IUpdateOperator<S, P>>(
       getUpdateOperatorName(task.status)
     );
-    if (updateOperator) {
+    if (updateOperator && updateOperator.updateTask) {
       return await updateOperator.updateTask(task, payload);
     }
 
@@ -144,7 +144,7 @@ export class Process<S extends string, P, C extends string>
     const readOperator = this.context.tryGetService<IReadOperator<S, P>>(
       getReadOperatorName(task.status)
     );
-    if (readOperator) {
+    if (readOperator && readOperator.isOperationValid) {
       return await readOperator.isOperationValid(task);
     }
 
