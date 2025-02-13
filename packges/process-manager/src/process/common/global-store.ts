@@ -11,7 +11,7 @@ export const actionHasBeenAlreadyAddedToStore = (
   `${processName.version}" has been already ` +
   `added to the global store`;
 
-export interface ActionMetadata {
+export interface ActionStoreMetadata {
   command: string;
   processName: ProcessName;
   relations: [string, string][];
@@ -20,7 +20,7 @@ export interface ActionMetadata {
   >;
 }
 
-export interface StepMetadata {
+export interface StepStoreMetadata {
   updateOperator: Type<IUpdateOperator<string, unknown>> | null;
   readOperator: Type<IReadOperator<string, unknown>> | null;
 }
@@ -28,11 +28,14 @@ export interface StepMetadata {
 export class GlobalStore {
   private readonly actionsMetadata = new Map<
     string,
-    Map<string, ActionMetadata>
+    Map<string, ActionStoreMetadata>
   >();
-  private readonly stepMetadata = new Map<string, Map<string, StepMetadata>>();
+  private readonly stepMetadata = new Map<
+    string,
+    Map<string, StepStoreMetadata>
+  >();
 
-  setActionMetadata(metadata: ActionMetadata) {
+  setActionMetadata(metadata: ActionStoreMetadata) {
     const { processName, command } = metadata;
     const pn = formatProcessName(processName);
     if (!this.actionsMetadata.has(pn)) {
@@ -48,7 +51,7 @@ export class GlobalStore {
     actions.set(command, metadata);
   }
 
-  getActionsMetadata(processName: ProcessName): ActionMetadata[] {
+  getActionsMetadata(processName: ProcessName): ActionStoreMetadata[] {
     const pn = formatProcessName(processName);
     if (!this.actionsMetadata.has(pn)) {
       return [];
@@ -63,7 +66,7 @@ export class GlobalStore {
   getActionMetadata(
     command: string,
     processName: ProcessName
-  ): ActionMetadata | null {
+  ): ActionStoreMetadata | null {
     const pn = formatProcessName(processName);
     if (!this.actionsMetadata.has(pn)) {
       return null;
@@ -84,7 +87,7 @@ export class GlobalStore {
   setStepMetadata(
     status: string,
     processName: ProcessName,
-    metadata: StepMetadata
+    metadata: StepStoreMetadata
   ) {
     const pn = formatProcessName(processName);
     if (!this.stepMetadata.has(pn)) {
@@ -97,7 +100,7 @@ export class GlobalStore {
   getStepMetadata(
     status: string,
     processName: ProcessName
-  ): StepMetadata | null {
+  ): StepStoreMetadata | null {
     const process = this.stepMetadata.get(formatProcessName(processName));
     return process?.get(status) ?? null;
   }
@@ -114,6 +117,7 @@ export interface GlobalThisWithStore {
   [GLOBAL_STORE_PROPERTY_NAME]?: GlobalStore;
 }
 
+/** @deprecated - must use @Module decorators */
 export function getGlobalStore(): GlobalStore {
   const _this = globalThis as unknown as GlobalThisWithStore;
   if (!_this[GLOBAL_STORE_PROPERTY_NAME]) {

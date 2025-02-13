@@ -1,4 +1,4 @@
-import { getGlobalStore, StepMetadata } from '../common';
+import { getGlobalStore, StepStoreMetadata } from '../common';
 import { classWithStatusAlreadyExist, Step } from './decorator';
 import { ProcessName } from '../process';
 import { getFakeReadOperator, getFakeUpdateOperator } from './spec-fakes';
@@ -32,7 +32,7 @@ describe('process-manager', () => {
         );
 
         expect(step).toBeDefined();
-        expect(step).toEqual<StepMetadata>({
+        expect(step).toEqual<StepStoreMetadata>({
           readOperator: null,
           updateOperator: null,
         });
@@ -55,7 +55,7 @@ describe('process-manager', () => {
         );
 
         expect(step).toBeDefined();
-        expect(step).toEqual<StepMetadata>({
+        expect(step).toEqual<StepStoreMetadata>({
           readOperator: FakeReadOperator,
           updateOperator: null,
         });
@@ -81,7 +81,7 @@ describe('process-manager', () => {
         );
 
         expect(step).toBeDefined();
-        expect(step).toEqual<StepMetadata>({
+        expect(step).toEqual<StepStoreMetadata>({
           readOperator: null,
           updateOperator: FakeUpdateOperator,
         });

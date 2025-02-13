@@ -1,7 +1,10 @@
-import { Type } from '../../context';
-import { getGlobalStore } from '../common';
 import { ProcessName } from '../process';
-import { IAction, IInitialTaskAction, INITIAL_ACTION_COMMAND } from './types';
+import {
+  ACTION_METADATA_PROPERTIES,
+  ActionClass,
+  IAction,
+  IInitialTaskAction,
+} from './types';
 
 export interface ActionDecoratorProperties<S extends string, C extends string> {
   command: C;
@@ -15,13 +18,13 @@ export function Action<S extends string, C extends string>(
 ) {
   const { command, relations, processName } = properties;
 
-  return <A extends Type<IAction<S, unknown>>>(target: A) => {
-    getGlobalStore().setActionMetadata({
-      command,
-      relations: relations ?? [],
+  return <A extends ActionClass<IAction<S, unknown>>>(target: A) => {
+    target[ACTION_METADATA_PROPERTIES] = {
       processName,
-      actionType: target,
-    });
+      command,
+      type: 'action',
+      relations: relations ?? [],
+    };
     return target;
   };
 }
@@ -30,32 +33,16 @@ export interface InitialActionDecoratorProperties {
   processName: ProcessName;
 }
 
-export const initialActionHasAlreadyBeenExist = (name: string) =>
-  `There is already initial action named ${name}`;
-
 export function InitialAction(properties: InitialActionDecoratorProperties) {
-  return <A extends Type<IInitialTaskAction<string, unknown, unknown>>>(
+  const { processName } = properties;
+
+  return <A extends ActionClass<IInitialTaskAction<string, unknown, unknown>>>(
     target: A
   ) => {
-    const { processName } = properties;
-
-    const existAction = getGlobalStore().getActionMetadata(
-      INITIAL_ACTION_COMMAND,
-      processName
-    );
-
-    if (existAction) {
-      throw new Error(
-        initialActionHasAlreadyBeenExist(existAction.actionType.name)
-      );
-    }
-
-    getGlobalStore().setActionMetadata({
-      command: INITIAL_ACTION_COMMAND,
-      relations: [],
+    target[ACTION_METADATA_PROPERTIES] = {
+      type: 'initial-action',
       processName,
-      actionType: target,
-    });
+    };
     return target;
   };
 }

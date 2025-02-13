@@ -23,7 +23,7 @@ export class GraphProcessor<NV, W> implements Graph<NV, W> {
       throw new Error(NODE_NOT_EXIST_ERROR);
     }
     const existEdge = this.edges.filter(
-      (e) => e.start === startNode.id && e.end === endNode.id,
+      (e) => e.start === startNode.id && e.end === endNode.id
     )[0];
     if (existEdge) {
       throw new Error(EDGE_HAS_BEEN_ADDED_ERROR);
@@ -79,12 +79,16 @@ export class GraphProcessor<NV, W> implements Graph<NV, W> {
       .concat(
         this.edges
           .filter((e) => e.end === nodeId)
-          .map(({ start, end }) => ({ start: end, end: start })),
+          .map(({ start, end }) => ({ start: end, end: start }))
       );
   }
 
   searchNodes(predicate: (node: NV) => boolean): GraphNode<NV>[] {
     return this.nodes.filter((n) => predicate(n.value));
+  }
+
+  hasNodesWith(predicate: (node: NV) => boolean): boolean {
+    return this.nodes.filter((n) => predicate(n.value)).length > 0;
   }
 
   searchEdges(predicate: (edge: W) => boolean): GraphEdge<W>[] {
@@ -98,6 +102,7 @@ export class GraphProcessor<NV, W> implements Graph<NV, W> {
   }
 }
 
-export const NODE_NOT_EXIST_ERROR = 'There is no a node in the graph with such value.';
+export const NODE_NOT_EXIST_ERROR =
+  'There is no a node in the graph with such value.';
 export const NODE_HAS_BEEN_ADDED_ERROR = 'Node has existed yet.';
 export const EDGE_HAS_BEEN_ADDED_ERROR = 'Edge has existed yet';

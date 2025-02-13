@@ -1,0 +1,109 @@
+
+/// types.ts
+
+type MyCommand = ...
+type MyStatus = ...
+
+export const TODO_PROCESS_NAME: ProcessName = {
+  name: 'todo demo',
+  version: '1.0',
+};
+
+/// actions.ts
+
+@InitialAction(...)
+export class InitialTodoAction
+  implements IInitialTaskAction<...> { ... }
+
+@Action(...)
+export class ToWorkAction
+  implements IInitialTaskAction<...> { ... }
+
+
+@Module({
+  actions: [
+    InitialTodoAction,
+    ToWorkAction
+  ]
+})
+export class ActionsModule {}
+
+/// steps.ts
+
+export class OperatorProhibitingUpdate
+  implements IUpdateOperator<...> { ... }
+
+@Step<TodoStatus>({
+  processName: TODO_PROCESS_NAME,
+  status: 'new',
+  updateOperator: OperatorProhibitingUpdate,
+})
+export class NewStep {}
+
+@Module({
+  steps: [
+    NewStep
+  ]
+})
+export class StepsModule {}
+
+/// services.ts
+
+export class BackendUrlService {
+   getUrl() {
+    return 'https://example.com'
+   }
+}
+
+export class ApiService {
+  constructor(
+    @Inject(BackendUrlService) private backendUrl: BackendUrlService
+  ) {}
+}
+
+@Module({
+  services: [
+    BackendUrlService,
+    {token: 'api', type: ApiService }
+  ]
+})
+export class ServicesModule {}
+
+/// app.ts
+
+@Module({
+  modules: [
+    ActionsModule,
+    StepsModule,
+    ServicesModule,
+  ]
+})
+class AppModule {}
+
+// App class
+const app = bootstrapApp(AppModule);
+
+const task = await app.createTask({...});
+
+@Application({
+  modules: [
+    ActionsModule,
+    StepsModule,
+    ServicesModule,
+  ]
+}}
+export class App {
+  constructor(
+      @Inject(BackendUrlService) private backendUrl: BackendUrlService
+    ) {}
+
+  async onInit() {}
+  async onDestroy() {}
+  pipe(context) {
+    return context.pipe(
+      onError(GlobalErrorHandler),
+      onTaskUpdate(GlobalUpdateHandler),
+      onActionInvoke(GlobalActionInvoke),
+    )
+  }
+}

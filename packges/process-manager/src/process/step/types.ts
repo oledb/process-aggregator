@@ -1,5 +1,6 @@
 import { ProcessName } from '../process';
 import { ITask, ValidationState } from '../common';
+import { Type } from '../../context';
 
 export interface IStep<S extends string> {
   processName: ProcessName;
@@ -13,4 +14,10 @@ export interface IUpdateOperator<S extends string, P> {
 
 export interface IReadOperator<S extends string, P> {
   isOperationValid?(task: ITask<S, P>): Promise<ValidationState>;
+}
+
+export interface StepDecoratorProperties<S extends string, P = unknown>
+  extends IStep<S> {
+  updateOperator?: Type<IUpdateOperator<S, P>>;
+  readOperator?: Type<IReadOperator<S, P>>;
 }

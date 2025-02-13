@@ -1,12 +1,6 @@
-import { IReadOperator, IStep, IUpdateOperator } from './types';
+import { StepDecoratorProperties } from './types';
 import { getGlobalStore } from '../common';
 import { Type } from '../../context';
-
-export interface StepDecoratorProperties<S extends string, P = unknown>
-  extends IStep<S> {
-  updateOperator?: Type<IUpdateOperator<S, P>>;
-  readOperator?: Type<IReadOperator<S, P>>;
-}
 
 export const classWithStatusAlreadyExist = (
   status: string,
