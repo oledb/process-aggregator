@@ -1,5 +1,8 @@
-import { StepDecoratorProperties } from './types';
-import { getGlobalStore } from '../common';
+import {
+  STEP_METADATA_PROPERTIES,
+  StepClass,
+  StepDecoratorProperties,
+} from './types';
 import { Type } from '../../context';
 
 export const classWithStatusAlreadyExist = (
@@ -13,15 +16,13 @@ export function Step<S extends string, P = unknown>(
   properties: StepDecoratorProperties<S, P>
 ) {
   const { status, processName, updateOperator, readOperator } = properties;
-  return <T extends Type<unknown>>(target: T) => {
-    const metadata = getGlobalStore().getStepMetadata(status, processName);
-    if (metadata) {
-      throw new Error(classWithStatusAlreadyExist(status, target));
-    }
-    getGlobalStore().setStepMetadata(status, processName, {
-      readOperator: readOperator ?? null,
+  return <St extends StepClass<unknown>>(target: St) => {
+    target[STEP_METADATA_PROPERTIES] = {
+      status,
+      processName,
       updateOperator: updateOperator ?? null,
-    });
+      readOperator: readOperator ?? null,
+    };
     return target;
   };
 }

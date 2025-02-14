@@ -21,7 +21,6 @@ export function addAction<S extends string, P, C extends string>(
   };
 }
 
-/** @deprecated */
 export function addInitialAction<S extends string, P, C extends string, IS>(
   type: Type<IInitialTaskAction<S, P, IS>>
 ): ContextOperator {
@@ -31,7 +30,6 @@ export function addInitialAction<S extends string, P, C extends string, IS>(
   };
 }
 
-/** @deprecated */
 export function addActions<S extends string, P, C extends string>(
   ...actions: [C, Type<IAction<S, P>>][]
 ): ContextOperator {

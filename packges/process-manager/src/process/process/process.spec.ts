@@ -22,14 +22,9 @@ import { deepClone } from '../../utils/types/objects';
 import { addActionContext } from '../actions';
 import { addInitialAction } from '../process-builder';
 import { createContextBuilder, IContext } from '../../context';
+import { IRelationWeight, ITask, ValidationState } from '../common';
 import {
-  getGlobalStore,
-  IRelationWeight,
-  ITask,
-  ValidationState,
-} from '../common';
-import {
-  addStepOperatorsFromStore,
+  addStepOperatorFromMetadata,
   IReadOperator,
   IStep,
   IUpdateOperator,
@@ -416,15 +411,12 @@ describe('process-manager', () => {
               processName: FAKE_PROCESS_NAME,
               readOperator: InProgressReadOperation,
             })
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             class InProgressStep {}
 
-            return addStepOperatorsFromStore(FAKE_PROCESS_NAME)(c);
+            return addStepOperatorFromMetadata(InProgressStep)(c);
           })
         );
       });
-
-      afterEach(() => getGlobalStore().clear());
 
       it('return valid status', async () => {
         const state = await process.validateReadOperation({
@@ -486,15 +478,12 @@ describe('process-manager', () => {
               processName: FAKE_PROCESS_NAME,
               updateOperator: InProgressUpdateOperation,
             })
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             class InProgressStep {}
 
-            return addStepOperatorsFromStore(FAKE_PROCESS_NAME)(c);
+            return addStepOperatorFromMetadata(InProgressStep)(c);
           })
         );
       });
-
-      afterEach(() => getGlobalStore().clear());
 
       describe('validateUpdateOperation', () => {
         it('return valid operation', async () => {
