@@ -1,12 +1,12 @@
-import { Step } from './decorator';
-import { ProcessName } from '../process';
-import { getFakeReadOperator, getFakeUpdateOperator } from './spec-fakes';
+import { Step } from '../decorator';
+import { ProcessName } from '../../process';
+import { getFakeReadOperator, getFakeUpdateOperator } from '../spec-fakes';
 import {
   asStepClass,
   isStepClass,
   STEP_METADATA_PROPERTIES,
   StepMetadata,
-} from './types';
+} from '../types';
 
 describe('process-manager', () => {
   describe('step', () => {

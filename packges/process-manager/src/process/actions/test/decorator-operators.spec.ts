@@ -1,13 +1,13 @@
-import { getFakeAction, getFakeInitialAction } from './spec-fakes';
-import { createContextBuilder } from '../../context';
+import { getFakeAction, getFakeInitialAction } from '../spec-fakes';
+import { createContextBuilder } from '../../../context';
 import {
   addActionToContext,
   addRelationAndStepToProcess,
-} from './decorator-operators';
-import { createProcessBuilder } from '../process-builder';
-import { getProcessFactory, ProcessName } from '../process';
-import { Action, InitialAction } from './decorators';
-import { INITIAL_ACTION_COMMAND } from './types';
+} from '../decorator-operators';
+import { createProcessBuilder } from '../../process-builder';
+import { getProcessFactory, ProcessName } from '../../process';
+import { Action, InitialAction } from '../decorators';
+import { INITIAL_ACTION_COMMAND } from '../types';
 
 describe('process-manager', () => {
   describe('action-decorator-operators', () => {

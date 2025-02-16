@@ -1,16 +1,16 @@
-import { Action, INITIAL_ACTION_COMMAND, InitialAction } from '../actions';
-import { getFakeAction, getFakeInitialAction } from '../actions/spec-fakes';
-import { ProcessName } from '../process';
-import { Inject } from '../../context';
-import { Module } from './decorators';
-import { bootstrapContext } from './decorator-operators';
+import { Action, INITIAL_ACTION_COMMAND, InitialAction } from '../../actions';
+import { getFakeAction, getFakeInitialAction } from '../../actions/spec-fakes';
+import { ProcessName } from '../../process';
+import { Inject } from '../../../context';
+import { Module } from '../decorators';
+import { bootstrapContext } from '../decorator-operators';
 import {
   getFakeReadOperator,
   getFakeUpdateOperator,
   getReadOperatorName,
   getUpdateOperatorName,
   Step,
-} from '../step';
+} from '../../step';
 
 describe('process-manager', () => {
   describe('module', () => {

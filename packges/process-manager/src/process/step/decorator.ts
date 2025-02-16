@@ -3,14 +3,6 @@ import {
   StepClass,
   StepDecoratorProperties,
 } from './types';
-import { Type } from '../../context';
-
-export const classWithStatusAlreadyExist = (
-  status: string,
-  newOne: Type<unknown>
-) =>
-  `Class ${newOne.name} with status "${status}" cannot be added ` +
-  `because class with the same status already exist`;
 
 export function Step<S extends string, P = unknown>(
   properties: StepDecoratorProperties<S, P>

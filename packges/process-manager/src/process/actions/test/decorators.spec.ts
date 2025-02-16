@@ -1,13 +1,13 @@
-import { Action, InitialAction } from './decorators';
-import { getFakeAction, getFakeInitialAction } from './spec-fakes';
-import { ProcessName } from '../process';
+import { Action, InitialAction } from '../decorators';
+import { getFakeAction, getFakeInitialAction } from '../spec-fakes';
+import { ProcessName } from '../../process';
 import {
   ACTION_METADATA_PROPERTIES,
   ActionMetadata,
   asActionClass,
   InitialActionMetadata,
   isActionClass,
-} from './types';
+} from '../types';
 
 describe('process-manager', () => {
   describe('action', () => {

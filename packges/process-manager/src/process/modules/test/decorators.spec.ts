@@ -1,4 +1,4 @@
-import { isModule, Module } from './decorators';
+import { isModule, Module } from '../decorators';
 
 describe('process-manager', () => {
   describe('module', () => {

@@ -1,6 +1,6 @@
-import { createContextBuilder } from '../../context';
-import { addRelation, addStep, createProcessBuilder } from './process-builder';
-import { getProcessFactory, Process, ProcessName } from '../process';
+import { createContextBuilder } from '../../../context';
+import { addRelation, addStep, createProcessBuilder } from '../process-builder';
+import { getProcessFactory, Process, ProcessName } from '../../process';
 
 describe('process-manager', () => {
   describe('process-builder', () => {

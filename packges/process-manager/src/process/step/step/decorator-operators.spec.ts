@@ -1,12 +1,12 @@
-import { getFakeReadOperator, getFakeUpdateOperator } from './spec-fakes';
-import { Step } from './decorator';
-import { ProcessName } from '../process';
-import { createContextBuilder } from '../../context';
+import { getFakeReadOperator, getFakeUpdateOperator } from '../spec-fakes';
+import { Step } from '../decorator';
+import { ProcessName } from '../../process';
+import { createContextBuilder } from '../../../context';
 import {
   addStepOperatorFromMetadata,
   getReadOperatorName,
   getUpdateOperatorName,
-} from './decorator-operators';
+} from '../decorator-operators';
 
 describe('process-manager', () => {
   describe('step', () => {

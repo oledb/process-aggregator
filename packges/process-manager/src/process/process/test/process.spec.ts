@@ -4,7 +4,7 @@ import {
   INITIAL_COMMAND_NOT_FOUND,
   Process,
   updateMethodNotImplemented,
-} from './process';
+} from '../process';
 import {
   bootstrapEmptyFakeProcess,
   bootstrapFakeProcess,
@@ -17,20 +17,20 @@ import {
   createActionValidationError,
   ProcessFakeCreateActionWithoutValidation,
   bootstrapFakeContext,
-} from './spec-fakes';
-import { deepClone } from '../../utils/types/objects';
-import { addInitialAction } from '../process-builder';
-import { createContextBuilder, IContext } from '../../context';
-import { IRelationWeight, ITask, ValidationState } from '../common';
+} from '../spec-fakes';
+import { deepClone } from '../../../utils/types/objects';
+import { addInitialAction } from '../../process-builder';
+import { createContextBuilder, IContext } from '../../../context';
+import { IRelationWeight, ITask, ValidationState } from '../../common';
 import {
   addStepOperatorFromMetadata,
   IReadOperator,
   IStep,
   IUpdateOperator,
   Step,
-} from '../step';
-import { GraphEdge } from '../../graph';
-import { IProcess } from './types';
+} from '../../step';
+import { GraphEdge } from '../../../graph';
+import { IProcess } from '../types';
 
 describe('process-manager', () => {
   describe('process', () => {
