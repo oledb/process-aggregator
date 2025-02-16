@@ -16,6 +16,10 @@ export interface IInitialTaskAction<S extends string, P, IS> {
   createTask(initialState: IS): Promise<ITask<S, P>>;
 }
 
+export type ICommonAction<S extends string, P, IS> =
+  | IAction<S, P>
+  | IInitialTaskAction<S, P, IS>;
+
 export type ActionMetadata = {
   type: 'action';
   processName: ProcessName;
@@ -35,16 +39,24 @@ export interface ActionClass<T> extends Type<T> {
 }
 
 export function isActionClass<T = unknown>(
-  type: unknown
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  type: Function
 ): type is ActionClass<T> {
   return (
     typeof type === 'function' &&
-    typeof type[ACTION_METADATA_PROPERTIES] === 'object'
+    typeof (type as ActionClass<T>)[ACTION_METADATA_PROPERTIES] === 'object'
   );
 }
 
+export const actionDecoratorRequired = (type: string) =>
+  `Type ${type} is required @Action decorator`;
+
 export function asActionClass<T = unknown>(
-  type: unknown
-): ActionClass<T> | null {
-  return isActionClass<T>(type) ? type : null;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  type: Function
+): Required<ActionClass<T>> {
+  if (isActionClass<T>(type)) {
+    return type as Required<ActionClass<T>>;
+  }
+  throw new Error(actionDecoratorRequired(type.name));
 }

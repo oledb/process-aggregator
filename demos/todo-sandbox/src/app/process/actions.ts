@@ -5,6 +5,7 @@ import {
   InitialAction,
   Inject,
   ITask,
+  Module,
   ProcessName,
   ValidationState,
 } from '@process-aggregator/process-manager';
@@ -158,3 +159,14 @@ export class CloseAction implements IAction<TodoStatus, Todo> {
     return this.todoRepository.getTask(task.id);
   }
 }
+
+@Module({
+  actions: [
+    InitialTodoAction,
+    ToWorkAction,
+    CloseAction,
+    HoldAction,
+    CompleteAction,
+  ],
+})
+export class ActionsModule {}

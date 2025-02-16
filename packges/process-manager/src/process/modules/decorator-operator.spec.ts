@@ -4,6 +4,13 @@ import { ProcessName } from '../process';
 import { Inject } from '../../context';
 import { Module } from './decorators';
 import { bootstrapContext } from './decorator-operators';
+import {
+  getFakeReadOperator,
+  getFakeUpdateOperator,
+  getReadOperatorName,
+  getUpdateOperatorName,
+  Step,
+} from '../step';
 
 describe('process-manager', () => {
   describe('module', () => {
@@ -141,7 +148,7 @@ describe('process-manager', () => {
           expect(action.service instanceof Service).toEqual(true);
         });
 
-        it('crate initial action', () => {
+        it('create initial action', () => {
           @Module({
             actions: [CreateTask],
           })
@@ -153,6 +160,43 @@ describe('process-manager', () => {
 
           expect(action).toBeDefined();
           expect(action instanceof CreateTask).toEqual(true);
+        });
+
+        describe('step', () => {
+          class FakeUpdateOperator extends getFakeUpdateOperator<
+            FakeStatus,
+            unknown
+          >() {}
+          class FakeReadOperator extends getFakeReadOperator() {}
+
+          @Step<FakeStatus>({
+            processName,
+            status: 'active',
+            updateOperator: FakeUpdateOperator,
+            readOperator: FakeReadOperator,
+          })
+          class ActiveStep {}
+
+          it('create step from root module', () => {
+            @Module({
+              steps: [ActiveStep],
+            })
+            class RootModule {}
+
+            const context = bootstrapContext(RootModule);
+
+            const readOperator = context.getService(
+              getReadOperatorName('active')
+            );
+            const updateOperator = context.getService(
+              getUpdateOperatorName('active')
+            );
+
+            expect(readOperator).toBeDefined();
+            expect(readOperator instanceof FakeReadOperator).toBeTruthy();
+            expect(updateOperator).toBeDefined();
+            expect(updateOperator instanceof FakeUpdateOperator).toBeTruthy();
+          });
         });
       });
     });

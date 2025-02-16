@@ -3,6 +3,7 @@ import { Inject } from '../../context';
 import { Context } from '../../context/context';
 import { IAction } from './types';
 
+/** @deprecated - move ActionContext logic to Process class */
 export function addActionContext(): ContextOperator {
   return (context) => {
     context.setSingleton(ActionContext);

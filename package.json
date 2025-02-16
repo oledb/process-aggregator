@@ -2,7 +2,9 @@
   "name": "@process-aggregator/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "test": "npx nx run-many -t test --skipNxCache --output-style stream"
+  },
   "private": true,
   "dependencies": {},
   "devDependencies": {

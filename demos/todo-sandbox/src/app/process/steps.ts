@@ -3,6 +3,7 @@ import {
   IReadOperator,
   ITask,
   IUpdateOperator,
+  Module,
   Step,
   ValidationState,
 } from '@process-aggregator/process-manager';
@@ -100,3 +101,8 @@ export class CompletedStep {}
   readOperator: OperatorProhibitingRead,
 })
 export class ClosedStep {}
+
+@Module({
+  steps: [NewStep, InProgressStep, HoldingStep, CompletedStep, ClosedStep],
+})
+export class StepsModule {}

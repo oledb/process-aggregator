@@ -13,6 +13,6 @@ export function Module(properties: ModuleProperties = {}) {
 export function isModule(type: unknown): type is ModuleClass {
   return (
     typeof type === 'function' &&
-    typeof type[MODULE_METADATA_PROPERTY] === 'object'
+    typeof (type as ModuleClass)[MODULE_METADATA_PROPERTY] === 'object'
   );
 }

@@ -4,31 +4,45 @@ import { ProcessBuilderOperators, ProcessName } from '../process';
 import {
   ACTION_METADATA_PROPERTIES,
   ActionClass,
+  ActionMetadata,
+  asActionClass,
   INITIAL_ACTION_COMMAND,
 } from './types';
+import {
+  asModuleClass,
+  MODULE_METADATA_PROPERTY,
+  ModuleClass,
+} from '../modules';
 
-/** @deprecated - must use @Module decorators */
-export function addActionsFromStore(processName: ProcessName): ContextOperator {
-  return (context) => {
-    for (const metadata of getGlobalStore().getActionsMetadata(processName)) {
-      context.setInstance(metadata.command, metadata.actionType);
-    }
-    return context;
-  };
-}
-
-/** @deprecated */
 export function addRelationsAndStepsFromStore<
   S extends string,
   P,
-  C extends string
->(): ProcessBuilderOperators<S, P, C> {
+  C extends string,
+  M extends ModuleClass
+>(module: M): ProcessBuilderOperators<S, P, C> {
   return (process) => {
+    const actionsMeta = (function getActionsMeta(m: M): ActionMetadata[] {
+      const meta = asModuleClass(m)[MODULE_METADATA_PROPERTY];
+
+      if (!meta) {
+        return [];
+      }
+
+      const result = (meta.actions ?? [])
+        .filter(
+          (a) => asActionClass(a)[ACTION_METADATA_PROPERTIES].type === 'action'
+        )
+        .map(
+          (a) => asActionClass(a)[ACTION_METADATA_PROPERTIES] as ActionMetadata
+        );
+      return result.concat(
+        ...(meta.modules ?? []).map((mm) => getActionsMeta(asModuleClass(mm)))
+      );
+    })(module);
+
     const steps = new Set<S>();
     const relations: [S, S, C][] = [];
-    for (const metadata of getGlobalStore().getActionsMetadata(
-      process.processName
-    )) {
+    for (const metadata of actionsMeta) {
       const { command } = metadata;
       for (const relation of metadata.relations) {
         const [from, to] = relation as [S, S];
@@ -51,7 +65,7 @@ export function addActionToContext<A extends ActionClass<T>, T = unknown>(
   actionType: A
 ): ContextOperator {
   return (context) => {
-    const meta = actionType[ACTION_METADATA_PROPERTIES];
+    const meta = asActionClass(actionType)[ACTION_METADATA_PROPERTIES];
     if (meta.type === 'action') {
       context.setInstance(meta.command, actionType);
     } else {
@@ -69,7 +83,7 @@ export function addRelationAndStepToProcess<
   T = unknown
 >(actionType: A): ProcessBuilderOperators<S, P, C> {
   return (context) => {
-    const meta = actionType[ACTION_METADATA_PROPERTIES];
+    const meta = asActionClass(actionType)[ACTION_METADATA_PROPERTIES];
     if (meta.type === 'action') {
       const { relations, command } = meta;
       for (const relation of relations) {

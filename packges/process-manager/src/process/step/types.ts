@@ -28,7 +28,7 @@ export interface StepMetadata {
   processName: ProcessName;
   status: string;
   updateOperator: Type<IUpdateOperator<string, unknown>> | null;
-  readOperator: Type<IReadOperator<string, unknown>>;
+  readOperator: Type<IReadOperator<string, unknown>> | null;
 }
 
 export const STEP_METADATA_PROPERTIES = Symbol('Step metadata property');
@@ -40,7 +40,7 @@ export interface StepClass<T> extends Type<T> {
 export function isStepClass<T = unknown>(type: unknown): type is StepClass<T> {
   return (
     typeof type === 'function' &&
-    typeof type[STEP_METADATA_PROPERTIES] === 'object'
+    typeof (type as StepClass<T>)[STEP_METADATA_PROPERTIES] === 'object'
   );
 }
 

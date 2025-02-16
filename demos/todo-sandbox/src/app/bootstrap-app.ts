@@ -1,38 +1,35 @@
 import {
   addActionContext,
-  addActionsFromStore,
+  addActionToContext,
   addRelationsAndStepsFromStore,
   addSingleton,
-  addStepOperatorsFromStore,
+  addStepOperatorFromMetadata,
+  bootstrapContext,
   createContextBuilder,
   createProcessBuilder,
   getProcessFactory,
-  importFile,
+  Module,
 } from '@process-aggregator/process-manager';
 import { TodoCommand, TODO_PROCESS_NAME, TodoStatus } from './process/types';
 import { App } from './app';
 import { TodoTaskRepository } from './services/todo-task-repository';
 import { Todo } from './models';
-import * as actions from './process/actions';
-import * as steps from './process/steps';
+import { ActionsModule } from './process/actions';
+import { StepsModule } from './process/steps';
+import { ProvidersModule } from './services/providers.module';
 
-importFile(actions);
-importFile(steps);
+@Module({
+  modules: [ActionsModule, StepsModule, ProvidersModule],
+})
+class RootModule {}
 
 export function bootstrapApp() {
-  const context = createContextBuilder()
-    .pipe(addSingleton(TodoTaskRepository))
-    .pipe(
-      addActionContext(),
-      addActionsFromStore(TODO_PROCESS_NAME),
-      addStepOperatorsFromStore(TODO_PROCESS_NAME)
-    )
-    .build();
+  const context = bootstrapContext(RootModule);
 
   const processManager = createProcessBuilder<TodoStatus, Todo, TodoCommand>(
     TODO_PROCESS_NAME,
     context
-  ).pipe(addRelationsAndStepsFromStore());
+  ).pipe(addRelationsAndStepsFromStore(RootModule));
 
   const process = processManager.build(getProcessFactory());
 

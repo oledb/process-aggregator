@@ -39,8 +39,11 @@ export function addStepOperatorFromMetadata<
 >(type: St): ContextOperator {
   return (context) => {
     const meta = type[STEP_METADATA_PROPERTIES];
+    if (!meta) {
+      return context;
+    }
     const { status, updateOperator, readOperator } = meta;
-    if (meta.updateOperator) {
+    if (updateOperator) {
       context.setInstance(getUpdateOperatorName(status), updateOperator);
     }
     if (readOperator) {
