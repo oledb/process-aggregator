@@ -1,6 +1,6 @@
 import { IContext } from '../../context';
 import {
-  ActionContext,
+  IAction,
   IInitialTaskAction,
   INITIAL_ACTION_COMMAND,
 } from '../actions';
@@ -28,13 +28,10 @@ export class Process<S extends string, P, C extends string>
   implements IProcess<S, P, C>, IProcessWritable<S, P, C>
 {
   public readonly graph = new GraphProcessor<IStep<S>, IRelationWeight<C>>();
-  readonly actionContext: ActionContext<S, P, C>;
   constructor(
     public readonly processName: ProcessName,
     private readonly context: IContext
-  ) {
-    this.actionContext = context.getService(ActionContext<S, P, C>);
-  }
+  ) {}
 
   addStep(status: S): void {
     this.graph.addNode({ processName: this.processName, status });
@@ -55,7 +52,7 @@ export class Process<S extends string, P, C extends string>
   async validateInitialState<IS>(initialState: IS): Promise<ValidationState> {
     let initialAction: IInitialTaskAction<S, P, IS> | null = null;
     try {
-      initialAction = this.actionContext.getAction(
+      initialAction = this.context.getService(
         INITIAL_ACTION_COMMAND as C
       ) as unknown as IInitialTaskAction<S, P, IS>;
     } catch {
@@ -73,7 +70,7 @@ export class Process<S extends string, P, C extends string>
   async createInitialTask<IS>(initialState: IS): Promise<ITask<S, P>> {
     let initialAction: IInitialTaskAction<S, P, IS> | null = null;
     try {
-      initialAction = this.actionContext.getAction(
+      initialAction = this.context.getService(
         INITIAL_ACTION_COMMAND as C
       ) as unknown as IInitialTaskAction<S, P, IS>;
     } catch {
@@ -91,7 +88,7 @@ export class Process<S extends string, P, C extends string>
     if (!weight) {
       throw new Error(commandNotFound(command));
     }
-    const action = this.actionContext.getAction(command);
+    const action = this.context.getService(command) as IAction<S, P>;
     if (typeof action.validateTask === 'function') {
       return action.validateTask(task);
     }
@@ -105,7 +102,7 @@ export class Process<S extends string, P, C extends string>
     if (!weight) {
       throw new Error(commandNotFound(command));
     }
-    const action = this.actionContext.getAction(command);
+    const action = this.context.getService(command) as IAction<S, P>;
     action.processName = this.processName;
     return action.updateTask(task);
   }

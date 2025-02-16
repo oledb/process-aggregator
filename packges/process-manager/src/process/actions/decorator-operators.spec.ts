@@ -5,7 +5,6 @@ import {
   addRelationAndStepToProcess,
 } from './decorator-operators';
 import { createProcessBuilder } from '../process-builder';
-import { addActionContext } from './action-context';
 import { getProcessFactory, ProcessName } from '../process';
 import { Action, InitialAction } from './decorators';
 import { INITIAL_ACTION_COMMAND } from './types';
@@ -69,7 +68,7 @@ describe('process-manager', () => {
         class ActivateAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
         const context = createContextBuilder()
-          .pipe(addActionToContext(ActivateAction), addActionContext())
+          .pipe(addActionToContext(ActivateAction))
           .build();
         const process = createProcessBuilder<
           FakeStatus,
@@ -102,8 +101,7 @@ describe('process-manager', () => {
         const context = createContextBuilder()
           .pipe(
             addActionToContext(ActivateAction),
-            addActionToContext(CloseAction),
-            addActionContext()
+            addActionToContext(CloseAction)
           )
           .build();
         const process = createProcessBuilder<

@@ -19,7 +19,6 @@ import {
   bootstrapFakeContext,
 } from './spec-fakes';
 import { deepClone } from '../../utils/types/objects';
-import { addActionContext } from '../actions';
 import { addInitialAction } from '../process-builder';
 import { createContextBuilder, IContext } from '../../context';
 import { IRelationWeight, ITask, ValidationState } from '../common';
@@ -57,7 +56,7 @@ describe('process-manager', () => {
 
     describe('addStep', () => {
       it('add step to process', () => {
-        const context = createContextBuilder().pipe(addActionContext()).build();
+        const context = createContextBuilder().build();
         const process = new Process(FAKE_PROCESS_NAME, context);
 
         process.addStep('active');
@@ -77,7 +76,7 @@ describe('process-manager', () => {
       let process!: Process<string, unknown, string>;
 
       beforeEach(() => {
-        context = createContextBuilder().pipe(addActionContext()).build();
+        context = createContextBuilder().build();
         process = new Process(FAKE_PROCESS_NAME, context);
       });
 
@@ -279,10 +278,7 @@ describe('process-manager', () => {
 
       it('validate initial command without action method. Return true by default', async () => {
         const context = createContextBuilder()
-          .pipe(
-            addInitialAction(ProcessFakeCreateActionWithoutValidation),
-            addActionContext()
-          )
+          .pipe(addInitialAction(ProcessFakeCreateActionWithoutValidation))
           .build();
 
         const process = bootstrapEmptyFakeProcess(context);

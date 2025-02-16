@@ -5,7 +5,7 @@ import {
   addSteps,
   createProcessBuilder,
 } from '../process-builder';
-import { addActionContext, IAction, IInitialTaskAction } from '../actions';
+import { IAction, IInitialTaskAction } from '../actions';
 import { getProcessFactory } from './process';
 import { ContextOperator, createContextBuilder, IContext } from '../../context';
 import { ProcessName } from './types';
@@ -139,12 +139,11 @@ export function bootstrapFakeContext(operator: ContextOperator = (c) => c) {
       ),
       operator
     )
-    .pipe(addActionContext())
     .build();
 }
 
 export function bootstrapEmptyFakeContext() {
-  return createContextBuilder().pipe(addActionContext()).build();
+  return createContextBuilder().build();
 }
 
 export function bootstrapFakeProcess(

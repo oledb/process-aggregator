@@ -5,11 +5,7 @@ import {
   Type,
 } from '../../context';
 import { IProcess } from '../process';
-import {
-  addActionContext,
-  addActionToContext,
-  ICommonAction,
-} from '../actions';
+import { addActionToContext, ICommonAction } from '../actions';
 import {
   asModuleClass,
   MODULE_METADATA_PROPERTY,
@@ -44,7 +40,6 @@ export function bootstrapContext(module: ModuleClass): IContext {
 
   return createContextBuilder()
     .pipe(
-      addActionContext(),
       ...getServices(module).map(addSingleton),
       ...getActions(module).map(addActionToContext),
       ...getSteps(module).map(addStepOperatorFromMetadata)
