@@ -1,6 +1,6 @@
-import { IAction, IInitialTaskAction } from './types';
-import { ProcessName } from '../process';
-import { ITask } from '../common';
+import { IAction, IInitialTaskAction } from '../types';
+import { ProcessName } from '../../process';
+import { ITask } from '../../common';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

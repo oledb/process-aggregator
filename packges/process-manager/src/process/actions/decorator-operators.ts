@@ -12,8 +12,9 @@ import {
   MODULE_METADATA_PROPERTY,
   ModuleClass,
 } from '../modules';
+import { UnknownErrorException } from '../exceptions';
 
-export function addRelationsAndStepsFromStore<
+export function addRelationsAndStepsFromModule<
   S extends string,
   P,
   C extends string,
@@ -96,7 +97,7 @@ export function addRelationAndStepToProcess<
         context.addRelation(from, to, command as C);
       }
     } else {
-      throw new Error('Initial Action error');
+      throw new UnknownErrorException();
     }
     return context;
   };

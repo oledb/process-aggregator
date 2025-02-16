@@ -1,10 +1,4 @@
-import {
-  commandNotFound,
-  stepNotFound,
-  INITIAL_COMMAND_NOT_FOUND,
-  Process,
-  updateMethodNotImplemented,
-} from '../process';
+import { Process } from '../process';
 import {
   bootstrapEmptyFakeProcess,
   bootstrapFakeProcess,
@@ -17,7 +11,7 @@ import {
   createActionValidationError,
   ProcessFakeCreateActionWithoutValidation,
   bootstrapFakeContext,
-} from '../spec-fakes';
+} from './spec-fakes';
 import { deepClone } from '../../../utils/types/objects';
 import { addInitialAction } from '../../process-builder';
 import { createContextBuilder, IContext } from '../../../context';
@@ -31,6 +25,11 @@ import {
 } from '../../step';
 import { GraphEdge } from '../../../graph';
 import { IProcess } from '../types';
+import {
+  CommandNotFoundException,
+  StepNotFoundException,
+  UpdateMethodNotImplementedException,
+} from '../../exceptions';
 
 describe('process-manager', () => {
   describe('process', () => {
@@ -103,7 +102,7 @@ describe('process-manager', () => {
         process.addStep('active');
 
         expect(() => process.addRelation('new', 'active', 'activate')).toThrow(
-          stepNotFound('new')
+          new StepNotFoundException('new')
         );
 
         const [edge] = process.graph.searchEdges(
@@ -117,7 +116,7 @@ describe('process-manager', () => {
         process.addStep('new');
 
         expect(() => process.addRelation('new', 'active', 'activate')).toThrow(
-          stepNotFound('active')
+          new StepNotFoundException('active')
         );
 
         const [edge] = process.graph.searchEdges(
@@ -187,7 +186,7 @@ describe('process-manager', () => {
 
         await expect(() =>
           process.validateCommand('to-work', newTask)
-        ).rejects.toThrow(commandNotFound('to-work'));
+        ).rejects.toThrow(new CommandNotFoundException('to-work'));
       });
 
       it('validation failed for incorrect task', async () => {
@@ -223,7 +222,7 @@ describe('process-manager', () => {
 
         expect(() =>
           process.validateCommand('review', newTask)
-        ).rejects.toThrow(commandNotFound('review'));
+        ).rejects.toThrow(new CommandNotFoundException('review'));
       });
     });
 
@@ -247,7 +246,7 @@ describe('process-manager', () => {
         const payload: ProcessFakePayload = { name: 'test task' };
 
         await expect(() => process.createInitialTask(payload)).rejects.toThrow(
-          INITIAL_COMMAND_NOT_FOUND
+          new CommandNotFoundException('Initial command')
         );
       });
     });
@@ -297,7 +296,7 @@ describe('process-manager', () => {
 
         await expect(() =>
           process.validateInitialState(payload)
-        ).rejects.toThrow(INITIAL_COMMAND_NOT_FOUND);
+        ).rejects.toThrow(new CommandNotFoundException('Initial command'));
       });
     });
 
@@ -338,7 +337,7 @@ describe('process-manager', () => {
         };
 
         expect(() => process.invokeCommand('review', newTask)).rejects.toThrow(
-          commandNotFound('review')
+          new CommandNotFoundException('review')
         );
       });
     });
@@ -370,7 +369,7 @@ describe('process-manager', () => {
         const process = bootstrapEmptyFakeProcess();
 
         expect(() => process.getAvailableStatusCommands('new')).toThrow(
-          stepNotFound('new')
+          new CommandNotFoundException('new')
         );
       });
     });
@@ -538,7 +537,7 @@ describe('process-manager', () => {
           const payload: ProcessFakePayload = { name: 'My Task 1' };
 
           await expect(() => process.updateTask(task, payload)).rejects.toThrow(
-            updateMethodNotImplemented('closed')
+            new UpdateMethodNotImplementedException('closed')
           );
         });
       });

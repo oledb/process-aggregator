@@ -1,4 +1,4 @@
-import { getFakeReadOperator, getFakeUpdateOperator } from '../spec-fakes';
+import { getFakeReadOperator, getFakeUpdateOperator } from './spec-fakes';
 import { Step } from '../decorator';
 import { ProcessName } from '../../process';
 import { createContextBuilder } from '../../../context';

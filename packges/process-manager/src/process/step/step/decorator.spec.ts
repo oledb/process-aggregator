@@ -1,6 +1,6 @@
 import { Step } from '../decorator';
 import { ProcessName } from '../../process';
-import { getFakeReadOperator, getFakeUpdateOperator } from '../spec-fakes';
+import { getFakeReadOperator, getFakeUpdateOperator } from './spec-fakes';
 import {
   asStepClass,
   isStepClass,

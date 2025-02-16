@@ -1,6 +1,7 @@
 import { ProcessName } from '../process';
 import { ITask, ValidationState } from '../common';
 import { Type } from '../../context';
+import { DecoratorIsRequiredException } from '../exceptions';
 
 export interface IAction<S extends string, P> {
   processName: ProcessName;
@@ -48,9 +49,6 @@ export function isActionClass<T = unknown>(
   );
 }
 
-export const actionDecoratorRequired = (type: string) =>
-  `Type ${type} is required @Action decorator`;
-
 export function asActionClass<T = unknown>(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   type: Function
@@ -58,5 +56,5 @@ export function asActionClass<T = unknown>(
   if (isActionClass<T>(type)) {
     return type as Required<ActionClass<T>>;
   }
-  throw new Error(actionDecoratorRequired(type.name));
+  throw new DecoratorIsRequiredException(type.name, 'Action');
 }

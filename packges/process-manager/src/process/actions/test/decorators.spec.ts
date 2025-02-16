@@ -1,5 +1,5 @@
 import { Action, InitialAction } from '../decorators';
-import { getFakeAction, getFakeInitialAction } from '../spec-fakes';
+import { getFakeAction, getFakeInitialAction } from './spec-fakes';
 import { ProcessName } from '../../process';
 import {
   ACTION_METADATA_PROPERTIES,
@@ -8,6 +8,7 @@ import {
   InitialActionMetadata,
   isActionClass,
 } from '../types';
+import { DecoratorIsRequiredException } from '../../exceptions';
 
 describe('process-manager', () => {
   describe('action', () => {
@@ -51,6 +52,26 @@ describe('process-manager', () => {
           processName: processNameV1,
           type: 'initial-action',
         });
+      });
+
+      @Action({
+        command: 'close',
+        processName: processNameV1,
+        relations: [['active', 'closed']],
+      })
+      class ActionType extends getFakeAction<FakeStatus, FakePayload>() {}
+      class NotActionType {}
+
+      it('isActionClass function', () => {
+        expect(isActionClass(ActionType)).toEqual(true);
+        expect(isActionClass(NotActionType)).toEqual(false);
+      });
+
+      it('asActionClass function', () => {
+        expect(asActionClass(ActionType)).toEqual(ActionType);
+        expect(() => asActionClass(NotActionType)).toThrow(
+          new DecoratorIsRequiredException(NotActionType.name, 'Action')
+        );
       });
     });
   });

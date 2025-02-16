@@ -1,5 +1,8 @@
 import { Action, INITIAL_ACTION_COMMAND, InitialAction } from '../../actions';
-import { getFakeAction, getFakeInitialAction } from '../../actions/spec-fakes';
+import {
+  getFakeAction,
+  getFakeInitialAction,
+} from '../../actions/test/spec-fakes';
 import { ProcessName } from '../../process';
 import { Inject } from '../../../context';
 import { Module } from '../decorators';

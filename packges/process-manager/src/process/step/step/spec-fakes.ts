@@ -1,5 +1,5 @@
-import { IReadOperator, IUpdateOperator } from './types';
-import { ITask, ValidationState } from '../common';
+import { IReadOperator, IUpdateOperator } from '../types';
+import { ITask, ValidationState } from '../../common';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

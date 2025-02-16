@@ -4,12 +4,16 @@ import {
   addRelations,
   addSteps,
   createProcessBuilder,
-} from '../process-builder';
-import { IAction, IInitialTaskAction } from '../actions';
-import { getProcessFactory } from './process';
-import { ContextOperator, createContextBuilder, IContext } from '../../context';
-import { ProcessName } from './types';
-import { ITask, ValidationState } from '../common';
+} from '../../process-builder';
+import { IAction, IInitialTaskAction } from '../../actions';
+import { getProcessFactory } from '../process';
+import {
+  ContextOperator,
+  createContextBuilder,
+  IContext,
+} from '../../../context';
+import { ProcessName } from '../types';
+import { ITask, ValidationState } from '../../common';
 
 export type ProcessFakeStatus = 'new' | 'in-progress' | 'closed';
 export type ProcessFakeCommand = 'to-work' | 'close' | 'review';

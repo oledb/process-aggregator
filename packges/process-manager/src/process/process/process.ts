@@ -15,6 +15,11 @@ import {
   IStep,
   IUpdateOperator,
 } from '../step';
+import {
+  CommandNotFoundException,
+  StepNotFoundException,
+  UpdateMethodNotImplementedException,
+} from '../exceptions';
 
 export function getProcessFactory<
   S extends string,
@@ -40,11 +45,11 @@ export class Process<S extends string, P, C extends string>
   addRelation(from: S, to: S, command: C): void {
     const fromStep = this.graph.searchNodes((n) => n.status === from)[0];
     if (!fromStep) {
-      throw new Error(stepNotFound(from));
+      throw new StepNotFoundException(from);
     }
     const toStep = this.graph.searchNodes((n) => n.status === to)[0];
     if (!toStep) {
-      throw new Error(stepNotFound(to));
+      throw new StepNotFoundException(to);
     }
     this.graph.addEdge(fromStep.value, toStep.value, { command });
   }
@@ -56,7 +61,7 @@ export class Process<S extends string, P, C extends string>
         INITIAL_ACTION_COMMAND as C
       ) as unknown as IInitialTaskAction<S, P, IS>;
     } catch {
-      throw new Error(INITIAL_COMMAND_NOT_FOUND);
+      throw new CommandNotFoundException('Initial command');
     }
     initialAction.processName = this.processName;
     if (initialAction.validateInitialState) {
@@ -74,7 +79,7 @@ export class Process<S extends string, P, C extends string>
         INITIAL_ACTION_COMMAND as C
       ) as unknown as IInitialTaskAction<S, P, IS>;
     } catch {
-      throw new Error(INITIAL_COMMAND_NOT_FOUND);
+      throw new CommandNotFoundException('Initial command');
     }
     initialAction.processName = this.processName;
     return initialAction.createTask(initialState);
@@ -86,7 +91,7 @@ export class Process<S extends string, P, C extends string>
   ): Promise<ValidationState> {
     const weight = this.graph.searchEdges((e) => e.command === command)[0];
     if (!weight) {
-      throw new Error(commandNotFound(command));
+      throw new CommandNotFoundException(command);
     }
     const action = this.context.getService(command) as IAction<S, P>;
     if (typeof action.validateTask === 'function') {
@@ -100,7 +105,7 @@ export class Process<S extends string, P, C extends string>
   async invokeCommand(command: C, task: ITask<S, P>): Promise<ITask<S, P>> {
     const weight = this.graph.searchEdges((e) => e.command === command)[0];
     if (!weight) {
-      throw new Error(commandNotFound(command));
+      throw new CommandNotFoundException(command);
     }
     const action = this.context.getService(command) as IAction<S, P>;
     action.processName = this.processName;
@@ -110,7 +115,7 @@ export class Process<S extends string, P, C extends string>
   getAvailableStatusCommands(status: S): C[] {
     const node = this.graph.searchNodes((n) => n.status === status)[0];
     if (!node) {
-      throw new Error(stepNotFound(status));
+      throw new StepNotFoundException(status);
     }
     return this.graph.getNodeWeightsById(node.id).map((e) => e.command);
   }
@@ -134,7 +139,7 @@ export class Process<S extends string, P, C extends string>
       return await updateOperator.updateTask(task, payload);
     }
 
-    throw new Error(updateMethodNotImplemented(task.status));
+    throw new UpdateMethodNotImplementedException(task.status);
   }
 
   async validateReadOperation(task: ITask<S, P>): Promise<ValidationState> {
@@ -152,11 +157,3 @@ export class Process<S extends string, P, C extends string>
     return this as unknown as Process;
   }
 }
-
-export const INITIAL_COMMAND_NOT_FOUND = 'Initial command not found';
-export const commandNotFound = (status: string) =>
-  `"${status}" command not found`;
-export const stepNotFound = (status: string) =>
-  `Step for status "${status}" not found`;
-export const updateMethodNotImplemented = (status: string) =>
-  `The update task method is not implemented for status "${status}"`;

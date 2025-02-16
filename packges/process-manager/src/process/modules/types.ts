@@ -1,5 +1,6 @@
 import { Type } from '../../context';
 import { ICommonAction } from '../actions';
+import { DecoratorIsRequiredException } from '../exceptions';
 
 export type ServiceTypeProvider<T> = Type<T>;
 export type ServiceStringProvider<T> = {
@@ -30,9 +31,6 @@ export function isModuleClass<M extends ModuleClass>(
   );
 }
 
-export const moduleDecoratorRequired = (type: string) =>
-  `Type ${type} required @Module decorator`;
-
 export function asModuleClass<M extends ModuleClass>(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   type: Function
@@ -40,5 +38,5 @@ export function asModuleClass<M extends ModuleClass>(
   if (isModuleClass<M>(type)) {
     return type;
   }
-  throw new Error(moduleDecoratorRequired(type.name));
+  throw new DecoratorIsRequiredException(type.name, 'Module');
 }

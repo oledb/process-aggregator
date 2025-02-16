@@ -1,11 +1,6 @@
 import {
-  addActionContext,
-  addActionToContext,
-  addRelationsAndStepsFromStore,
-  addSingleton,
-  addStepOperatorFromMetadata,
+  addRelationsAndStepsFromModule,
   bootstrapContext,
-  createContextBuilder,
   createProcessBuilder,
   getProcessFactory,
   Module,
@@ -29,7 +24,7 @@ export function bootstrapApp() {
   const processManager = createProcessBuilder<TodoStatus, Todo, TodoCommand>(
     TODO_PROCESS_NAME,
     context
-  ).pipe(addRelationsAndStepsFromStore(RootModule));
+  ).pipe(addRelationsAndStepsFromModule(RootModule));
 
   const process = processManager.build(getProcessFactory());
 
