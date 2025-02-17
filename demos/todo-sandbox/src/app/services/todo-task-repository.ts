@@ -4,7 +4,8 @@ import { Todo } from '../models';
 
 export class TodoTaskRepository {
   private idCounter = 0;
-  private readonly tasks: Array<ITask<TodoStatus, Todo>> = [];
+
+  constructor(private readonly tasks: Array<ITask<TodoStatus, Todo>> = []) {}
 
   async getTasks() {
     return this.tasks;
