@@ -16,7 +16,7 @@ export function addAction<S extends string, P, C extends string>(
   type: Type<IAction<S, P>>
 ): ContextOperator {
   return (context) => {
-    context.setInstance(command, type);
+    context.setTransient(command, type);
     return context;
   };
 }
@@ -25,7 +25,7 @@ export function addInitialAction<S extends string, P, C extends string, IS>(
   type: Type<IInitialTaskAction<S, P, IS>>
 ): ContextOperator {
   return (context) => {
-    context.setInstance(INITIAL_ACTION_COMMAND, type);
+    context.setTransient(INITIAL_ACTION_COMMAND, type);
     return context;
   };
 }
@@ -35,7 +35,7 @@ export function addActions<S extends string, P, C extends string>(
 ): ContextOperator {
   return (context) => {
     actions.forEach(([command, action]) =>
-      context.setInstance(command, action)
+      context.setTransient(command, action)
     );
     return context;
   };

@@ -10,12 +10,12 @@ import {
   asModuleClass,
   MODULE_METADATA_PROPERTY,
   ModuleClass,
-  ServiceTypeProvider,
+  ServiceProvider,
 } from './types';
 import { addStepOperatorFromMetadata } from '../step';
 
 export function bootstrapContext(module: ModuleClass): IContext {
-  const getServices = (module: ModuleClass): ServiceTypeProvider<unknown>[] => {
+  const getServices = (module: ModuleClass): ServiceProvider<unknown>[] => {
     const meta = asModuleClass(module)[MODULE_METADATA_PROPERTY];
     const providers = meta?.providers ?? [];
     const modules = meta?.modules ?? [];

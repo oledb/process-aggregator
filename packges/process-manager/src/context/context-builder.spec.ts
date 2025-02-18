@@ -1,5 +1,5 @@
 import {
-  addInstance,
+  addTransient,
   addSingleton,
   createContextBuilder,
 } from './context-builder';
@@ -24,7 +24,7 @@ describe('process-manager', () => {
 
     it('create context with string instance string token', () => {
       const context = createContextBuilder()
-        .pipe(addInstance('my-service', MyService))
+        .pipe(addTransient('my-service', MyService))
         .build();
 
       const service = context.getService<MyService>('my-service');
@@ -35,7 +35,7 @@ describe('process-manager', () => {
 
     it('create context with string instance type token', () => {
       const context = createContextBuilder()
-        .pipe(addInstance(MyService))
+        .pipe(addTransient(MyService))
         .build();
 
       const service1 = context.getService(MyService);

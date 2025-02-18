@@ -3,9 +3,10 @@ export interface Type<T> {
 }
 
 export interface IContextWriteable {
+  setSingleton<T>(token: string, type: Type<T>): void;
   setSingleton<T>(type: Type<T>): void;
-  setInstance<T>(token: string, type: Type<T>): void;
-  setInstance<T>(type: Type<T>): void;
+  setTransient<T>(token: string, type: Type<T>): void;
+  setTransient<T>(type: Type<T>): void;
 }
 
 export type ContextOperator = (context: IContextWriteable) => IContextWriteable;

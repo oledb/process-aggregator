@@ -14,6 +14,11 @@ import {
   getUpdateOperatorName,
   Step,
 } from '../../step';
+import {
+  getTaskRepository,
+  InMemoryTaskRepository,
+  provideInMemoryTaskRepository,
+} from '../../task-repository';
 
 describe('process-manager', () => {
   describe('module', () => {
@@ -82,6 +87,19 @@ describe('process-manager', () => {
           const service = context.getService(Service);
 
           expect(service).toBeDefined();
+        });
+
+        it('create service with string token', () => {
+          @Module({
+            providers: [provideInMemoryTaskRepository()],
+          })
+          class RootModule {}
+
+          const context = bootstrapContext(RootModule);
+          const repository = getTaskRepository(context);
+
+          expect(repository).toBeDefined();
+          expect(repository instanceof InMemoryTaskRepository).toEqual(true);
         });
 
         it('create action from root module', () => {

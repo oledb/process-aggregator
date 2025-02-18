@@ -1,13 +1,13 @@
-import { IProcess } from '@process-aggregator/process-manager';
+import { IProcess, ITaskRepository } from '@process-aggregator/process-manager';
 import { TodoCommand, TodoStatus } from './process/types';
-import { TodoTaskRepository } from './services/todo-task-repository';
 import { NewTodo } from './models';
 import { Todo } from './models';
+import { TaskNotFoundException } from './exceptions';
 
 export class App {
   constructor(
     private readonly process: IProcess<TodoStatus, Todo, TodoCommand>,
-    private readonly taskRepository: TodoTaskRepository
+    private readonly taskRepository: ITaskRepository<TodoStatus, Todo>
   ) {}
 
   async createTask(newTodo: NewTodo) {
@@ -58,6 +58,9 @@ export class App {
 
   async getTask(taskId: string) {
     const task = await this.taskRepository.getTask(taskId);
+    if (!task) {
+      throw new TaskNotFoundException(taskId);
+    }
     const validateState = await this.process.validateReadOperation(task);
     if (validateState.valid === 'false') {
       throw new Error(validateState.errorMessage ?? 'Error');
@@ -67,6 +70,9 @@ export class App {
 
   async updateTask(taskId: string, payload: Todo) {
     const task = await this.taskRepository.getTask(taskId);
+    if (!task) {
+      throw new TaskNotFoundException(taskId);
+    }
     const validationState = await this.process.validateUpdateOperation(task);
     if (validationState.valid === 'true') {
       return this.process.updateTask(task, payload);

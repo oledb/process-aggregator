@@ -2,21 +2,33 @@ import { ContextOperator, IContext, IContextBuilder, Type } from './types';
 import { Context } from './context';
 import { isType } from './utils';
 
-export const addSingleton = <T>(type: Type<T>) => {
+export function addSingleton<T>(type: Type<T>): ContextOperator;
+export function addSingleton<T>(token: string, type: Type<T>): ContextOperator;
+export function addSingleton<T>(
+  token: string | Type<T>,
+  type?: Type<T>
+): ContextOperator {
   return ((context) => {
-    context.setSingleton(type);
+    if (typeof token === 'string' && type) {
+      context.setSingleton(token, type);
+    } else if (isType(token) && !type) {
+      context.setSingleton(token);
+    }
     return context;
   }) as ContextOperator;
-};
+}
 
-export function addInstance<T>(type: Type<T>): ContextOperator;
-export function addInstance<T>(token: string, type: Type<T>): ContextOperator;
-export function addInstance<T>(token: string | Type<T>, type?: Type<T>): ContextOperator {
+export function addTransient<T>(type: Type<T>): ContextOperator;
+export function addTransient<T>(token: string, type: Type<T>): ContextOperator;
+export function addTransient<T>(
+  token: string | Type<T>,
+  type?: Type<T>
+): ContextOperator {
   return (context) => {
     if (typeof token === 'string' && type) {
-      context.setInstance(token, type);
+      context.setTransient(token, type);
     } else if (isType(token) && !type) {
-      context.setInstance(token);
+      context.setTransient(token);
     }
     return context;
   };

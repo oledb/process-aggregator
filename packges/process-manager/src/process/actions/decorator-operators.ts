@@ -67,9 +67,9 @@ export function addActionToContext<A extends ActionClass<T>, T = unknown>(
   return (context) => {
     const meta = asActionClass(actionType)[ACTION_METADATA_PROPERTIES];
     if (meta.type === 'action') {
-      context.setInstance(meta.command, actionType);
+      context.setTransient(meta.command, actionType);
     } else {
-      context.setInstance(INITIAL_ACTION_COMMAND, actionType);
+      context.setTransient(INITIAL_ACTION_COMMAND, actionType);
     }
     return context;
   };

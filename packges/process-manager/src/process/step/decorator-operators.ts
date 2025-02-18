@@ -20,10 +20,10 @@ export function addStepOperatorFromMetadata<
     }
     const { status, updateOperator, readOperator } = meta;
     if (updateOperator) {
-      context.setInstance(getUpdateOperatorName(status), updateOperator);
+      context.setTransient(getUpdateOperatorName(status), updateOperator);
     }
     if (readOperator) {
-      context.setInstance(getReadOperatorName(status), readOperator);
+      context.setTransient(getReadOperatorName(status), readOperator);
     }
     return context;
   };

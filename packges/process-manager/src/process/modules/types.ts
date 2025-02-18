@@ -8,11 +8,15 @@ export type ServiceStringProvider<T> = {
   type: Type<T>;
 };
 
+export type ServiceProvider<T> =
+  | ServiceStringProvider<T>
+  | ServiceTypeProvider<T>;
+
 export interface ModuleProperties {
   modules?: Type<object>[];
   actions?: Type<ICommonAction<string, unknown, unknown>>[];
   steps?: Type<object>[];
-  providers?: ServiceTypeProvider<unknown>[];
+  providers?: ServiceProvider<unknown>[];
 }
 
 export const MODULE_METADATA_PROPERTY = Symbol('Module Metadata Property');

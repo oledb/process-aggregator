@@ -1,7 +1,9 @@
-import { Module } from '@process-aggregator/process-manager';
-import { TodoTaskRepository } from './todo-task-repository';
+import {
+  Module,
+  provideInMemoryTaskRepository,
+} from '@process-aggregator/process-manager';
 
 @Module({
-  providers: [TodoTaskRepository],
+  providers: [provideInMemoryTaskRepository()],
 })
 export class ProvidersModule {}

@@ -57,11 +57,11 @@ describe('process-manager', () => {
       });
     });
 
-    describe('instances', () => {
+    describe('transients', () => {
       describe('type token', () => {
-        it('instance dependency by type', () => {
+        it('transient dependency by type', () => {
           const context = new Context();
-          context.setInstance(MyService);
+          context.setTransient(MyService);
 
           const service1 = context.getService(MyService);
           const service2 = context.getService(MyService);
@@ -72,7 +72,7 @@ describe('process-manager', () => {
           expect(service1 === service2).toEqual(false);
         });
 
-        it('getInstance throw error when type not found', () => {
+        it('gettransient throw error when type not found', () => {
           const context = new Context();
 
           expect(() => context.getService(MyService)).toThrow(
@@ -83,18 +83,18 @@ describe('process-manager', () => {
         it('setService throw error when add same type twice', () => {
           const context = new Context();
 
-          context.setInstance(MyService);
+          context.setTransient(MyService);
 
-          expect(() => context.setInstance(MyService)).toThrow(
+          expect(() => context.setTransient(MyService)).toThrow(
             TYPE_EXISTS_ERROR
           );
         });
       });
 
       describe('string token', () => {
-        it('instance dependency by string token', () => {
+        it('transient dependency by string token', () => {
           const context = new Context();
-          context.setInstance('my-service', MyService);
+          context.setTransient('my-service', MyService);
 
           const service = context.getService<MyService>('my-service');
 
@@ -110,7 +110,7 @@ describe('process-manager', () => {
           );
         });
 
-        it('getInstance throw error when string token not found', () => {
+        it('gettransient throw error when string token not found', () => {
           const context = new Context();
 
           expect(() => context.getService('my-service')).toThrow(
@@ -121,9 +121,9 @@ describe('process-manager', () => {
         it('setService throw error when add same string token twice', () => {
           const context = new Context();
 
-          context.setInstance('my-service', MyService);
+          context.setTransient('my-service', MyService);
 
-          expect(() => context.setInstance('my-service', MyService)).toThrow(
+          expect(() => context.setTransient('my-service', MyService)).toThrow(
             TYPE_EXISTS_ERROR
           );
         });
@@ -141,16 +141,16 @@ describe('process-manager', () => {
         }
       }
 
-      it('get instance of service with dependency', () => {
+      it('get transient of service with dependency', () => {
         const context = new Context();
-        context.setInstance(MyService);
-        context.setInstance(MySubService);
+        context.setTransient(MyService);
+        context.setTransient(MySubService);
 
-        const instance = context.getService(MySubService);
+        const transient = context.getService(MySubService);
 
-        expect(instance).toBeDefined();
-        expect(instance.myService).toBeDefined();
-        expect(instance.myService.name).toEqual('my service');
+        expect(transient).toBeDefined();
+        expect(transient.myService).toBeDefined();
+        expect(transient.myService.name).toEqual('my service');
       });
 
       it('get singleton of service with dependency', () => {
