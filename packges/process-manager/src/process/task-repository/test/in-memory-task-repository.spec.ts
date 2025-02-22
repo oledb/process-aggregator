@@ -67,12 +67,12 @@ describe('InMemoryTaskRepository', () => {
     expect(result).toEqual(null);
   });
 
-  it('should update task payload', async () => {
+  it('should update task', async () => {
     repository = new InMemoryTaskRepository(tasks);
     await repository.updateTask({
       id: '1',
       status: 'fake',
-      processName: { name: 'modified-process', version: '15.4' },
+      processName,
       payload: {
         value: 200,
         enable: true,
@@ -83,7 +83,7 @@ describe('InMemoryTaskRepository', () => {
     expect(task).toEqual({
       id: '1',
       processName,
-      status: 'closed',
+      status: 'fake',
       payload: {
         value: 200,
         enable: true,

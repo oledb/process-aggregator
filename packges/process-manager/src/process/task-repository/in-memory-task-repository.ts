@@ -38,7 +38,7 @@ export class InMemoryTaskRepository<S extends string, P>
     }
     const index = this.tasks.indexOf(temp);
     this.tasks[index] = {
-      ...temp,
+      ...task,
       payload: deepClone(task.payload),
     };
   }

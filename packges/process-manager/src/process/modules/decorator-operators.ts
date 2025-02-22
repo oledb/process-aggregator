@@ -40,7 +40,12 @@ export function bootstrapContext(module: ModuleClass): IContext {
 
   return createContextBuilder()
     .pipe(
-      ...getServices(module).map(addSingleton),
+      ...getServices(module).map((p) => {
+        if (typeof p === 'function') {
+          return addSingleton(p);
+        }
+        return addSingleton(p.token, p.type);
+      }),
       ...getActions(module).map(addActionToContext),
       ...getSteps(module).map(addStepOperatorFromMetadata)
     )

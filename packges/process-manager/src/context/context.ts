@@ -1,10 +1,15 @@
 import { IContext, IContextWriteable, Type } from './types';
-import { isType } from './utils';
+import { isType, tokenToString } from './utils';
 import { InjectedToken, SERVICE_INJECTION_ARGS } from './decorators';
 
 export const TYPE_EXISTS_ERROR = 'Type exists in current context';
-export const TYPE_DOES_NOT_EXIST_ERROR = `Type doesn't exist in current context`;
 export const UNKNOWN_ERROR = 'Unknown Error';
+
+export class TokenDoesNotExistException<T = unknown> extends Error {
+  constructor(token: string | Type<T>) {
+    super(`Token "${tokenToString(token)}" doesn't exist in current context`);
+  }
+}
 
 export class Context implements IContext, IContextWriteable {
   private readonly singletonTypes = new Map<
@@ -58,7 +63,7 @@ export class Context implements IContext, IContextWriteable {
     if (this.transientTypes.has(token)) {
       return this.getTransient<T>(token);
     }
-    throw new Error(TYPE_DOES_NOT_EXIST_ERROR);
+    throw new TokenDoesNotExistException(token);
   }
 
   tryGetService<T>(token: string | Type<T>): T | null {
@@ -80,17 +85,15 @@ export class Context implements IContext, IContextWriteable {
       this.singletonInstance.set(token, instance);
       return instance;
     }
-    throw new Error(TYPE_DOES_NOT_EXIST_ERROR);
+    throw new TokenDoesNotExistException(token);
   }
 
   private getTransient<T>(token: string | Type<T>): T {
     const type = this.transientTypes.get(token) as never;
     if (type) {
-      const instance = this.createTypeFromTypeToken(type) as T;
-      this.singletonInstance.set(token, instance);
-      return instance;
+      return this.createTypeFromTypeToken(type) as T;
     }
-    throw new Error(TYPE_DOES_NOT_EXIST_ERROR);
+    throw new TokenDoesNotExistException(token);
   }
 
   private createTypeFromTypeToken<T>(token: Type<T> & InjectedToken) {

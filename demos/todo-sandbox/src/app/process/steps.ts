@@ -2,13 +2,14 @@ import {
   Inject,
   IReadOperator,
   ITask,
+  ITaskRepository,
   IUpdateOperator,
   Module,
   Step,
+  TASK_REPOSITORY_TOKEN,
   ValidationState,
 } from '@process-aggregator/process-manager';
 import { TODO_PROCESS_NAME, TodoStatus } from './types';
-import { TodoTaskRepository } from '../services/todo-task-repository';
 import { Todo } from '../models';
 
 export const updatingIsProhibited = (status: string) =>
@@ -39,7 +40,8 @@ export class DefaultUpdateOperator
   implements IUpdateOperator<TodoStatus, Todo>
 {
   constructor(
-    @Inject(TodoTaskRepository) private readonly repository: TodoTaskRepository
+    @Inject(TASK_REPOSITORY_TOKEN)
+    private readonly todoRepository: ITaskRepository<TodoStatus, Todo>
   ) {}
 
   async updateTask(
@@ -51,7 +53,7 @@ export class DefaultUpdateOperator
       payload: { ...payload },
     };
 
-    await this.repository.updateTask(newTask);
+    await this.todoRepository.updateTask(newTask);
     return newTask;
   }
 }

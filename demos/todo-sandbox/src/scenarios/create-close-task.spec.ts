@@ -47,7 +47,7 @@ describe('todo-sandbox', () => {
 
   async function itMovesEssayTaskToWork() {
     let task = await app.getTask(essayTaskId);
-    expect(task.status).toEqual('new');
+    expect(task?.status).toEqual('new');
 
     const commands = await app.getTaskCommands(essayTaskId);
     expect(commands).toEqual<TodoCommand[]>(['to-work', 'close']);
@@ -60,16 +60,19 @@ describe('todo-sandbox', () => {
   }
 
   async function itUpdatesEssayTaskName() {
-    let fixedTodo = (await app.getTask(essayTaskId)).payload;
-    fixedTodo = {
-      ...fixedTodo,
+    const task = await app.getTask(essayTaskId);
+    if (task === null) {
+      throw new Error('Task not found');
+    }
+    const fixedTodo: Todo = {
+      ...task.payload,
       name: 'Write essay',
     };
     const result = await app.updateTask(essayTaskId, fixedTodo);
     const essayTask = await app.getTask(essayTaskId);
 
     expect(result.payload.name).toEqual('Write essay');
-    expect(essayTask.payload.name).toEqual('Write essay');
+    expect(essayTask?.payload.name).toEqual('Write essay');
   }
 
   async function itMovesEssayTaskToWorkAgainAndGetError() {
@@ -84,7 +87,7 @@ describe('todo-sandbox', () => {
 
   async function itMovesEssayTaskToHold() {
     let task = await app.getTask(essayTaskId);
-    expect(task.status).toEqual<TodoStatus>('in-progress');
+    expect(task?.status).toEqual<TodoStatus>('in-progress');
 
     const commands = await app.getTaskCommands(essayTaskId);
     expect(commands).toEqual<TodoCommand[]>(['hold', 'complete']);
@@ -98,7 +101,7 @@ describe('todo-sandbox', () => {
 
   async function itMovesEssayTaskFromHoldingToWorking() {
     let task = await app.getTask(essayTaskId);
-    expect(task.status).toEqual<TodoStatus>('holding');
+    expect(task?.status).toEqual<TodoStatus>('holding');
 
     const commands = await app.getTaskCommands(essayTaskId);
     expect(commands).toEqual<TodoCommand[]>(['to-work']);
@@ -129,7 +132,7 @@ describe('todo-sandbox', () => {
 
   async function itClosesTextbookTask() {
     let task = await app.getTask(textbookTaskId);
-    expect(task.status).toEqual<TodoStatus>('new');
+    expect(task?.status).toEqual<TodoStatus>('new');
 
     const commands = await app.getTaskCommands(textbookTaskId);
     expect(commands).toEqual<TodoCommand[]>(['to-work', 'close']);
@@ -152,7 +155,7 @@ describe('todo-sandbox', () => {
 
   async function itMovesEssayTaskToCompleteStatus() {
     let task = await app.getTask(essayTaskId);
-    expect(task.status).toEqual<TodoStatus>('in-progress');
+    expect(task?.status).toEqual<TodoStatus>('in-progress');
 
     const commands = await app.getTaskCommands(essayTaskId);
     expect(commands).toEqual<TodoCommand[]>(['hold', 'complete']);
@@ -166,7 +169,7 @@ describe('todo-sandbox', () => {
 
   async function itMovesEssayTaskToClosedStatus() {
     let task = await app.getTask(essayTaskId);
-    expect(task.status).toEqual<TodoStatus>('completed');
+    expect(task?.status).toEqual<TodoStatus>('completed');
 
     const commands = await app.getTaskCommands(essayTaskId);
     expect(commands).toEqual<TodoCommand[]>(['close']);

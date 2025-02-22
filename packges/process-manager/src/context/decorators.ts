@@ -4,15 +4,15 @@ export const SERVICE_INJECTION_ARGS = Symbol('Service Injection Args');
 const maxServiceArgsCount = 10;
 
 export interface InjectedToken {
-  [SERVICE_INJECTION_ARGS]?: unknown[]
+  [SERVICE_INJECTION_ARGS]?: unknown[];
 }
 
-export function Inject<T>(token: object) {
+export function Inject<T>(token: object | string) {
   return (target: Type<T> & InjectedToken, field: unknown, order: number) => {
     if (target[SERVICE_INJECTION_ARGS] === undefined) {
       target[SERVICE_INJECTION_ARGS] = Array.from(
         { length: maxServiceArgsCount },
-        () => undefined,
+        () => undefined
       );
     }
     target[SERVICE_INJECTION_ARGS][order] = token;

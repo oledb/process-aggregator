@@ -1,6 +1,6 @@
 import {
   Context,
-  TYPE_DOES_NOT_EXIST_ERROR,
+  TokenDoesNotExistException,
   TYPE_EXISTS_ERROR,
 } from './context';
 import { Inject } from './decorators';
@@ -42,7 +42,7 @@ describe('process-manager', () => {
         const context = new Context();
 
         expect(() => context.getService(MyService)).toThrow(
-          TYPE_DOES_NOT_EXIST_ERROR
+          new TokenDoesNotExistException(MyService)
         );
       });
 
@@ -54,6 +54,53 @@ describe('process-manager', () => {
         expect(() => context.setSingleton(MyService)).toThrow(
           TYPE_EXISTS_ERROR
         );
+      });
+
+      it('get singleton with string token', () => {
+        const context = new Context();
+
+        context.setSingleton('my-service', MyService);
+
+        const service = context.getService('my-service');
+
+        expect(service).toBeDefined();
+        expect(service instanceof MyService).toEqual(true);
+      });
+
+      it('get service with string token in dependency', () => {
+        class MySubService {
+          constructor(
+            @Inject('my-service') public readonly service: MyService
+          ) {}
+        }
+
+        const context = new Context();
+        context.setSingleton('my-service', MyService);
+        context.setSingleton(MySubService);
+
+        const subService = context.getService(MySubService);
+
+        expect(subService).toBeDefined();
+        expect(subService instanceof MySubService).toEqual(true);
+        expect(subService.service).toBeDefined();
+        expect(subService.service instanceof MyService).toEqual(true);
+      });
+
+      it('create singleton lazy', () => {
+        let count = 0;
+        class LazyService {
+          constructor() {
+            count++;
+          }
+        }
+
+        const context = new Context();
+        context.setSingleton(LazyService);
+        context.getService(LazyService);
+        context.getService(LazyService);
+        context.getService(LazyService);
+
+        expect(count).toEqual(1);
       });
     });
 
@@ -72,11 +119,11 @@ describe('process-manager', () => {
           expect(service1 === service2).toEqual(false);
         });
 
-        it('gettransient throw error when type not found', () => {
+        it('getTransient throw error when type not found', () => {
           const context = new Context();
 
           expect(() => context.getService(MyService)).toThrow(
-            TYPE_DOES_NOT_EXIST_ERROR
+            new TokenDoesNotExistException(MyService)
           );
         });
 
@@ -88,6 +135,23 @@ describe('process-manager', () => {
           expect(() => context.setTransient(MyService)).toThrow(
             TYPE_EXISTS_ERROR
           );
+        });
+
+        it('create transient every time when getting service', () => {
+          let count = 0;
+          class LazyService {
+            constructor() {
+              count++;
+            }
+          }
+
+          const context = new Context();
+          context.setTransient(LazyService);
+          context.getService(LazyService);
+          context.getService(LazyService);
+          context.getService(LazyService);
+
+          expect(count).toEqual(3);
         });
       });
 
@@ -106,15 +170,15 @@ describe('process-manager', () => {
           const context = new Context();
 
           expect(() => context.getService('my-service')).toThrow(
-            TYPE_DOES_NOT_EXIST_ERROR
+            new TokenDoesNotExistException('my-service')
           );
         });
 
-        it('gettransient throw error when string token not found', () => {
+        it('getTransient throw error when string token not found', () => {
           const context = new Context();
 
           expect(() => context.getService('my-service')).toThrow(
-            TYPE_DOES_NOT_EXIST_ERROR
+            new TokenDoesNotExistException('my-service')
           );
         });
 
@@ -131,14 +195,8 @@ describe('process-manager', () => {
     });
 
     describe('service with dependency', () => {
-      const myServiceUndefinedError = 'MyService is undefined';
-
       class MySubService {
-        constructor(@Inject(MyService) public readonly myService: MyService) {
-          if (!myService) {
-            throw new Error(myServiceUndefinedError);
-          }
-        }
+        constructor(@Inject(MyService) public readonly myService: MyService) {}
       }
 
       it('get transient of service with dependency', () => {

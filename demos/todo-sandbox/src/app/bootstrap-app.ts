@@ -3,11 +3,11 @@ import {
   bootstrapContext,
   createProcessBuilder,
   getProcessFactory,
+  getTaskRepository,
   Module,
 } from '@process-aggregator/process-manager';
 import { TodoCommand, TODO_PROCESS_NAME, TodoStatus } from './process/types';
 import { App } from './app';
-import { TodoTaskRepository } from './services/todo-task-repository';
 import { Todo } from './models';
 import { ActionsModule } from './process/actions';
 import { StepsModule } from './process/steps';
@@ -28,5 +28,5 @@ export function bootstrapApp() {
 
   const process = processManager.build(getProcessFactory());
 
-  return new App(process, context.getService(TodoTaskRepository));
+  return new App(process, getTaskRepository(context));
 }

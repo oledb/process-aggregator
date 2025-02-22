@@ -5,13 +5,23 @@ import {
   InitialAction,
   Inject,
   ITask,
+  ITaskRepository,
   Module,
   ProcessName,
+  TASK_REPOSITORY_TOKEN,
   ValidationState,
 } from '@process-aggregator/process-manager';
 import { TodoCommand, TODO_PROCESS_NAME, TodoStatus } from './types';
 import { NewTodo, Todo } from '../models';
-import { TodoTaskRepository } from '../services/todo-task-repository';
+
+function cleanTask(
+  task: ITask<TodoStatus, Todo> | null
+): ITask<TodoStatus, Todo> {
+  if (task === null) {
+    throw new Error(`Task is null`);
+  }
+  return task;
+}
 
 @InitialAction({
   processName: TODO_PROCESS_NAME,
@@ -22,8 +32,8 @@ export class InitialTodoAction
   processName!: ProcessName;
 
   constructor(
-    @Inject(TodoTaskRepository)
-    private readonly todoRepository: TodoTaskRepository
+    @Inject(TASK_REPOSITORY_TOKEN)
+    private readonly todoRepository: ITaskRepository<TodoStatus, Todo>
   ) {}
 
   async validateInitialState?(initialState: NewTodo): Promise<ValidationState> {
@@ -72,8 +82,8 @@ export class ToWorkAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
 
   constructor(
-    @Inject(TodoTaskRepository)
-    private readonly todoRepository: TodoTaskRepository
+    @Inject(TASK_REPOSITORY_TOKEN)
+    private readonly todoRepository: ITaskRepository<TodoStatus, Todo>
   ) {}
 
   async updateTask(
@@ -83,7 +93,7 @@ export class ToWorkAction implements IAction<TodoStatus, Todo> {
       ...task,
       status: 'in-progress',
     });
-    return this.todoRepository.getTask(task.id);
+    return cleanTask(await this.todoRepository.getTask(task.id));
   }
 }
 
@@ -96,8 +106,8 @@ export class HoldAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
 
   constructor(
-    @Inject(TodoTaskRepository)
-    private readonly todoRepository: TodoTaskRepository
+    @Inject(TASK_REPOSITORY_TOKEN)
+    private readonly todoRepository: ITaskRepository<TodoStatus, Todo>
   ) {}
 
   async updateTask(
@@ -107,7 +117,7 @@ export class HoldAction implements IAction<TodoStatus, Todo> {
       ...task,
       status: 'holding',
     });
-    return this.todoRepository.getTask(task.id);
+    return this.todoRepository.getTask(task.id).then(cleanTask);
   }
 }
 
@@ -120,8 +130,8 @@ export class CompleteAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
 
   constructor(
-    @Inject(TodoTaskRepository)
-    private readonly todoRepository: TodoTaskRepository
+    @Inject(TASK_REPOSITORY_TOKEN)
+    private readonly todoRepository: ITaskRepository<TodoStatus, Todo>
   ) {}
 
   async updateTask(
@@ -131,7 +141,7 @@ export class CompleteAction implements IAction<TodoStatus, Todo> {
       ...task,
       status: 'completed',
     });
-    return this.todoRepository.getTask(task.id);
+    return this.todoRepository.getTask(task.id).then(cleanTask);
   }
 }
 
@@ -146,8 +156,8 @@ export class CompleteAction implements IAction<TodoStatus, Todo> {
 export class CloseAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
   constructor(
-    @Inject(TodoTaskRepository)
-    private readonly todoRepository: TodoTaskRepository
+    @Inject(TASK_REPOSITORY_TOKEN)
+    private readonly todoRepository: ITaskRepository<TodoStatus, Todo>
   ) {}
   async updateTask(
     task: ITask<TodoStatus, Todo>
@@ -156,7 +166,7 @@ export class CloseAction implements IAction<TodoStatus, Todo> {
       ...task,
       status: 'closed',
     });
-    return this.todoRepository.getTask(task.id);
+    return this.todoRepository.getTask(task.id).then(cleanTask);
   }
 }
 

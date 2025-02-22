@@ -2,8 +2,8 @@ import { ContextOperator, IContext, IContextBuilder, Type } from './types';
 import { Context } from './context';
 import { isType } from './utils';
 
-export function addSingleton<T>(type: Type<T>): ContextOperator;
 export function addSingleton<T>(token: string, type: Type<T>): ContextOperator;
+export function addSingleton<T>(type: Type<T>): ContextOperator;
 export function addSingleton<T>(
   token: string | Type<T>,
   type?: Type<T>
