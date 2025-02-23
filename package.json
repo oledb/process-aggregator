@@ -8,14 +8,19 @@
     "core:release": "npx nx release --projects core --access public"
   },
   "private": false,
-  "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^9.8.0",
+    "@nestjs/schematics": "^10.0.1",
+    "@nestjs/testing": "^10.0.2",
     "@nx/esbuild": "20.4.0",
     "@nx/eslint": "20.4.0",
     "@nx/eslint-plugin": "20.4.0",
     "@nx/jest": "20.4.0",
     "@nx/js": "20.4.0",
+    "@nx/nest": "^20.4.0",
+    "@nx/node": "20.4.0",
+    "@nx/web": "20.4.0",
+    "@nx/webpack": "20.4.0",
     "@nx/workspace": "20.4.0",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
@@ -34,9 +39,18 @@
     "tslib": "^2.3.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.19.0",
-    "verdaccio": "^5.0.4"
+    "verdaccio": "^5.0.4",
+    "webpack-cli": "^5.1.4"
   },
   "nx": {
     "includedScripts": []
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.2",
+    "@nestjs/core": "^10.0.2",
+    "@nestjs/platform-express": "^10.0.2",
+    "axios": "^1.6.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
   }
 }
