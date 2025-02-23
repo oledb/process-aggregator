@@ -1,6 +1,6 @@
 {
   "name": "@process-aggregator/process-manager",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "type": "commonjs",
   "main": "./index.cjs",
