@@ -1,6 +1,6 @@
 {
   "name": "@oledb/process-aggregator-core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "commonjs",
   "main": "./index.cjs",
   "types": "./index.d.ts",

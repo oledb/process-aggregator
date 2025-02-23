@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "npx nx run-many -t test --skipNxCache --output-style stream"
+    "test": "npx nx run-many -t test --skipNxCache --output-style stream",
+    "core:publish": "npx nx release publish --projects core --access public",
+    "core:release": "npx nx release --projects core --access public"
   },
-  "private": true,
+  "private": false,
   "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^9.8.0",
