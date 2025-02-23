@@ -1,14 +1,19 @@
-import { bootstrapApp } from '../app/bootstrap-app';
+import { RootModule } from '../app/root-module';
 import { NewTodo, Todo } from '../app';
-import { TodoCommand } from '../app/process/types';
+import { TODO_PROCESS_NAME, TodoCommand } from '../app/process/types';
 import { TodoStatus } from '../app/process/types';
-import { startWithRegExp } from '@process-aggregator/process-manager';
-import { getCommandValidationFailedError } from '../app/app';
-import { COMMAND_IS_NOT_AVAILABLE } from '../app/app';
+import {
+  bootstrapApplication,
+  COMMAND_IS_NOT_AVAILABLE,
+  CommandValidationException,
+} from '@process-aggregator/process-manager';
 import { readIsProhibited, updatingIsProhibited } from '../app/process/steps';
 
 describe('todo-sandbox', () => {
-  const app = bootstrapApp();
+  const app = bootstrapApplication<TodoStatus, Todo, TodoCommand>(
+    RootModule,
+    TODO_PROCESS_NAME
+  );
   async function itChecksTasksIsEmpty() {
     expect(await app.getTasks()).toEqual([]);
   }
@@ -79,9 +84,7 @@ describe('todo-sandbox', () => {
     await expect(() =>
       app.invokeCommand(essayTaskId, 'to-work')
     ).rejects.toThrow(
-      startWithRegExp(
-        getCommandValidationFailedError('to-work', COMMAND_IS_NOT_AVAILABLE)
-      )
+      new CommandValidationException('to-work', COMMAND_IS_NOT_AVAILABLE)
     );
   }
 
@@ -149,7 +152,7 @@ describe('todo-sandbox', () => {
     await expect(() =>
       app.invokeCommand(textbookTaskId, 'to-work')
     ).rejects.toThrow(
-      getCommandValidationFailedError('to-work', COMMAND_IS_NOT_AVAILABLE)
+      new CommandValidationException('to-work', COMMAND_IS_NOT_AVAILABLE)
     );
   }
 

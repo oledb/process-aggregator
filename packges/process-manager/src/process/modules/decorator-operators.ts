@@ -4,7 +4,6 @@ import {
   IContext,
   Type,
 } from '../../context';
-import { IProcess } from '../process';
 import { addActionToContext, ICommonAction } from '../actions';
 import {
   asModuleClass,
@@ -50,11 +49,4 @@ export function bootstrapContext(module: ModuleClass): IContext {
       ...getSteps(module).map(addStepOperatorFromMetadata)
     )
     .build();
-}
-
-export function bootstrapProcess<S extends string, P, C extends string>(
-  module: Type<ModuleClass>,
-  context: IContext
-): IProcess<S, P, C> {
-  throw new Error('Not implemented yet');
 }

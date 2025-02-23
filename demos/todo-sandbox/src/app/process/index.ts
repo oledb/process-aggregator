@@ -1,1 +1,1 @@
-export * from '../bootstrap-app';
+export * from '../root-module';
