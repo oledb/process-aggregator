@@ -23,7 +23,7 @@ describe('process-manager', () => {
           processName,
         })
         class ActivateAction extends getFakeAction<FakeStatus, FakePayload>() {
-          name: string;
+          name = '';
         }
 
         const context = createContextBuilder()
@@ -44,7 +44,7 @@ describe('process-manager', () => {
           FakeStatus,
           FakePayload
         >() {
-          name: string;
+          name = '';
         }
 
         const context = createContextBuilder()

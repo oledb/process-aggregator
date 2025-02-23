@@ -15,9 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@process-aggregator/process-manager": [
-        "packges/process-manager/src/index.ts"
-      ],
+      "@oledb/process-aggregator-core": ["packages/core/src/index.ts"],
       "@process-aggregator/todo-sandbox": ["demos/todo-sandbox/src/index.ts"]
     }
   },

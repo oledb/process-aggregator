@@ -1,7 +1,6 @@
 {
-  "name": "@process-aggregator/process-manager",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@oledb/process-aggregator-core",
+  "version": "0.0.1",
   "type": "commonjs",
   "main": "./index.cjs",
   "types": "./index.d.ts",

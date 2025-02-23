@@ -1,4 +1,4 @@
-import { ProcessName } from '@process-aggregator/process-manager';
+import { ProcessName } from '@oledb/process-aggregator-core';
 
 export type TodoCommand = 'to-work' | 'hold' | 'complete' | 'close';
 export type TodoStatus =

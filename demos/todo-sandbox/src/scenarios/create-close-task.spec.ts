@@ -6,7 +6,7 @@ import {
   bootstrapApplication,
   COMMAND_IS_NOT_AVAILABLE,
   CommandValidationException,
-} from '@process-aggregator/process-manager';
+} from '@oledb/process-aggregator-core';
 import { readIsProhibited, updatingIsProhibited } from '../app/process/steps';
 
 describe('todo-sandbox', () => {

@@ -30,7 +30,7 @@ describe('process-manager', () => {
         processName,
         context
       )
-        .pipe(addStep('in-progress'), addStep('closed'))
+        .pipe(addStep('in-progress' as State), addStep('closed' as State))
         .build<Process<State, Payload, Command>>(getProcessFactory());
 
       const inProgressStep = process.graph.searchNodes(
@@ -52,8 +52,10 @@ describe('process-manager', () => {
         processName,
         context
       )
-        .pipe(addStep('in-progress'), addStep('closed'))
-        .pipe(addRelation('in-progress', 'closed', 'close'))
+        .pipe(addStep('in-progress' as State), addStep('closed' as State))
+        .pipe(
+          addRelation<State, number, Command>('in-progress', 'closed', 'close')
+        )
         .build<Process<State, Payload, Command>>(getProcessFactory());
 
       const closeEdge = process.graph.searchEdges(

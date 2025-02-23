@@ -21,7 +21,7 @@ export function addAction<S extends string, P, C extends string>(
   };
 }
 
-export function addInitialAction<S extends string, P, C extends string, IS>(
+export function addInitialAction<S extends string, P, IS>(
   type: Type<IInitialTaskAction<S, P, IS>>
 ): ContextOperator {
   return (context) => {

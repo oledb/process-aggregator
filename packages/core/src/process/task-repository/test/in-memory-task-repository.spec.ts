@@ -8,7 +8,7 @@ describe('InMemoryTaskRepository', () => {
     enable: boolean;
   }
   const processName = FAKE_PROCESS_NAME;
-  let repository: InMemoryTaskRepository<string, Payload>;
+  let repository: InMemoryTaskRepository<string, Payload> | undefined;
   let tasks: ITask<string, Payload>[] = [];
 
   beforeEach(() => {
@@ -52,9 +52,15 @@ describe('InMemoryTaskRepository', () => {
   it('task mutation should not affect repository content', async () => {
     repository = new InMemoryTaskRepository(tasks);
     let result = await repository.getTask('1');
+    if (result === null) {
+      throw new Error('Task is null');
+    }
     result.status = 'modified';
     result.payload.enable = true;
     result = await repository.getTask('1');
+    if (result === null) {
+      throw new Error('Task is null');
+    }
 
     expect(result.status).toEqual('closed');
     expect(result.payload.enable).toEqual(false);

@@ -1,7 +1,7 @@
 import {
   Module,
   provideInMemoryTaskRepository,
-} from '@process-aggregator/process-manager';
+} from '@oledb/process-aggregator-core';
 
 @Module({
   providers: [provideInMemoryTaskRepository()],

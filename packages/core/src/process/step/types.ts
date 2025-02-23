@@ -1,6 +1,7 @@
 import { ProcessName } from '../process';
 import { ITask, ValidationState } from '../common';
 import { Type } from '../../context';
+import { DecoratorIsRequiredException } from '../exceptions';
 
 export interface IStep<S extends string> {
   processName: ProcessName;
@@ -44,6 +45,12 @@ export function isStepClass<T = unknown>(type: unknown): type is StepClass<T> {
   );
 }
 
-export function asStepClass<T = unknown>(type: unknown): StepClass<T> | null {
-  return isStepClass<T>(type) ? type : null;
+export function asStepClass<T = unknown>(
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  type: Function
+): StepClass<T> {
+  if (isStepClass<T>(type)) {
+    return type;
+  }
+  throw new DecoratorIsRequiredException(type.name, 'Step');
 }

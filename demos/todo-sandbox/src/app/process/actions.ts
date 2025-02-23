@@ -10,7 +10,7 @@ import {
   ProcessName,
   TASK_REPOSITORY_TOKEN,
   ValidationState,
-} from '@process-aggregator/process-manager';
+} from '@oledb/process-aggregator-core';
 import { TodoCommand, TODO_PROCESS_NAME, TodoStatus } from './types';
 import { NewTodo, Todo } from '../models';
 

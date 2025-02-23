@@ -8,7 +8,7 @@ import {
   Step,
   TASK_REPOSITORY_TOKEN,
   ValidationState,
-} from '@process-aggregator/process-manager';
+} from '@oledb/process-aggregator-core';
 import { TODO_PROCESS_NAME, TodoStatus } from './types';
 import { Todo } from '../models';
 
