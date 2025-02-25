@@ -30,6 +30,7 @@ import {
   StepNotFoundException,
   UpdateMethodNotImplementedException,
 } from '../../exceptions';
+import { defaultContextFactory } from '../../../context/context-builder';
 
 describe('process-manager', () => {
   describe('process', () => {
@@ -55,7 +56,7 @@ describe('process-manager', () => {
 
     describe('addStep', () => {
       it('add step to process', () => {
-        const context = createContextBuilder().build();
+        const context = createContextBuilder().build(defaultContextFactory);
         const process = new Process(FAKE_PROCESS_NAME, context);
 
         process.addStep('active');
@@ -75,7 +76,7 @@ describe('process-manager', () => {
       let process!: Process<string, unknown, string>;
 
       beforeEach(() => {
-        context = createContextBuilder().build();
+        context = createContextBuilder().build(defaultContextFactory);
         process = new Process(FAKE_PROCESS_NAME, context);
       });
 
@@ -278,7 +279,7 @@ describe('process-manager', () => {
       it('validate initial command without action method. Return true by default', async () => {
         const context = createContextBuilder()
           .pipe(addInitialAction(ProcessFakeCreateActionWithoutValidation))
-          .build();
+          .build(defaultContextFactory);
 
         const process = bootstrapEmptyFakeProcess(context);
 

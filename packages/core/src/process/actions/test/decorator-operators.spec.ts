@@ -8,6 +8,7 @@ import { createProcessBuilder } from '../../process-builder';
 import { getProcessFactory, ProcessName } from '../../process';
 import { Action, InitialAction } from '../decorators';
 import { INITIAL_ACTION_COMMAND } from '../types';
+import { defaultContextFactory } from '../../../context/context-builder';
 
 describe('process-manager', () => {
   describe('action-decorator-operators', () => {
@@ -28,7 +29,7 @@ describe('process-manager', () => {
 
         const context = createContextBuilder()
           .pipe(addActionToContext(ActivateAction))
-          .build();
+          .build(defaultContextFactory);
 
         const action = context.getService('activate');
 
@@ -49,7 +50,7 @@ describe('process-manager', () => {
 
         const context = createContextBuilder()
           .pipe(addActionToContext(CreateTaskAction))
-          .build();
+          .build(defaultContextFactory);
 
         const action = context.getService(INITIAL_ACTION_COMMAND);
 
@@ -69,7 +70,7 @@ describe('process-manager', () => {
 
         const context = createContextBuilder()
           .pipe(addActionToContext(ActivateAction))
-          .build();
+          .build(defaultContextFactory);
         const process = createProcessBuilder<
           FakeStatus,
           FakePayload,
@@ -103,7 +104,7 @@ describe('process-manager', () => {
             addActionToContext(ActivateAction),
             addActionToContext(CloseAction)
           )
-          .build();
+          .build(defaultContextFactory);
         const process = createProcessBuilder<
           FakeStatus,
           FakePayload,

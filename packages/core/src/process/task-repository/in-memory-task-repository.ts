@@ -6,7 +6,7 @@ export class InMemoryTaskRepository<S extends string, P>
   implements ITaskRepository<S, P>
 {
   private idCounter = 0;
-  private readonly tasks: Array<ITask<S, P>> = [];
+  private tasks: Array<ITask<S, P>> = [];
 
   constructor(tasks: Array<ITask<S, P>> = []) {
     const id = Number(tasks[tasks.length - 1]?.id);
@@ -41,5 +41,10 @@ export class InMemoryTaskRepository<S extends string, P>
       ...task,
       payload: deepClone(task.payload),
     };
+  }
+
+  reset() {
+    this.tasks = [];
+    this.idCounter = 0;
   }
 }

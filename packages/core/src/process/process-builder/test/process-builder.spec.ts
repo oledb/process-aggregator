@@ -1,6 +1,7 @@
 import { createContextBuilder } from '../../../context';
 import { addRelation, addStep, createProcessBuilder } from '../process-builder';
 import { getProcessFactory, Process, ProcessName } from '../../process';
+import { defaultContextFactory } from '../../../context/context-builder';
 
 describe('process-manager', () => {
   describe('process-builder', () => {
@@ -13,7 +14,7 @@ describe('process-manager', () => {
     };
 
     it('create empty process', () => {
-      const context = createContextBuilder().build();
+      const context = createContextBuilder().build(defaultContextFactory);
       const process = createProcessBuilder(processName, context).build<
         Process<State, Payload, Command>
       >(getProcessFactory());
@@ -25,7 +26,7 @@ describe('process-manager', () => {
     });
 
     it('add steps', () => {
-      const context = createContextBuilder().build();
+      const context = createContextBuilder().build(defaultContextFactory);
       const process = createProcessBuilder<State, Payload, Command>(
         processName,
         context
@@ -47,7 +48,7 @@ describe('process-manager', () => {
     });
 
     it('add relation', () => {
-      const context = createContextBuilder().build();
+      const context = createContextBuilder().build(defaultContextFactory);
       const process = createProcessBuilder<State, Payload, Command>(
         processName,
         context

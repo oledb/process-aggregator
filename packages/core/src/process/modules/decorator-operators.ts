@@ -7,6 +7,7 @@ import {
 import { addActionToContext, ICommonAction } from '../actions';
 import { getModuleMetadata, ServiceProvider } from './types';
 import { addStepOperatorFromMetadata } from '../step';
+import { defaultContextFactory } from '../../context/context-builder';
 
 export function bootstrapContext(module: Type<unknown>): IContext {
   const getServices = (module: Type<unknown>): ServiceProvider<unknown>[] => {
@@ -43,5 +44,5 @@ export function bootstrapContext(module: Type<unknown>): IContext {
       ...getActions(module).map(addActionToContext),
       ...getSteps(module).map(addStepOperatorFromMetadata)
     )
-    .build();
+    .build(defaultContextFactory);
 }

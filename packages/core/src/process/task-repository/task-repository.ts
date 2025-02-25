@@ -7,4 +7,4 @@ export interface ITaskRepository<S extends string, P> {
   updateTask(task: ITask<S, P>): Promise<void>;
 }
 
-export const TASK_REPOSITORY_TOKEN = '^@task_repository@^';
+export const TASK_REPOSITORY_TOKEN = '__task_repository__';

@@ -1,26 +1,32 @@
 import {
   ContextOperator,
+  getActionMetadata,
   IContext,
   IContextWriteable,
+  INITIAL_ACTION_COMMAND,
   TokenDoesNotExistException,
   Type,
 } from '@oledb/process-aggregator-core';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { PaModuleOptions } from './module';
+import { PaModuleOptions } from './types';
 
 @Injectable()
-export class NestContext implements IContext, IContextWriteable, OnModuleInit {
-  private readonly tokens: (string | Type<unknown>)[] = [];
+export class NestPaContext implements IContext, IContextWriteable {
+  private readonly providers: {
+    token: string | Type<unknown>;
+    type: Type<unknown>;
+  }[] = [];
   private readonly instances = new Map<string | Type<unknown>, unknown>();
 
-  onModuleInit() {
-    for (const token of this.tokens) {
-      this.instances.set(token, this.moduleRef.get(token));
+  async initialize(moduleRef: ModuleRef) {
+    for (const provider of this.providers) {
+      this.instances.set(
+        provider.token,
+        await moduleRef.resolve(provider.type)
+      );
     }
   }
-
-  constructor(private readonly moduleRef: ModuleRef) {}
 
   setSingleton<T>(token: string, type: Type<T>): void;
   setSingleton<T>(type: Type<T>): void;
@@ -46,20 +52,26 @@ export class NestContext implements IContext, IContextWriteable, OnModuleInit {
 
   private addProvider<T>(token: string | Type<T>, type?: Type<T>) {
     if (token && type) {
-      this.tokens.push(token);
+      this.providers.push({ token, type });
     }
-    if (!token && type) {
-      this.tokens.push(type);
+    if (token && !type && typeof token === 'function') {
+      this.providers.push({ token, type: token });
     }
   }
 }
 
 export function setupNestContext(options: PaModuleOptions): ContextOperator {
   const actions = options.actions ?? [];
-  return (contex) => {
+  return (context) => {
     for (const action of actions) {
-      contex.setTransient(action);
+      const meta = getActionMetadata(action);
+      if (meta.type === 'action') {
+        context.setTransient(meta.command, action);
+      }
+      if (meta.type === 'initial-action') {
+        context.setTransient(INITIAL_ACTION_COMMAND, action);
+      }
     }
-    return contex;
+    return context;
   };
 }

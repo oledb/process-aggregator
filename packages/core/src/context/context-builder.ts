@@ -34,8 +34,11 @@ export function addTransient<T>(
   };
 }
 
-export type WriteableContextFactory = () => IContextWriteable;
-const defaultWriteableContextFactory = () => new Context();
+export type WriteableContextFactory<C extends IContext & IContextWriteable> =
+  () => C;
+export const defaultContextFactory: WriteableContextFactory<
+  IContext & IContextWriteable
+> = () => new Context();
 
 export class ContextBuilder {
   private operators: ContextOperator[] = [];
@@ -45,14 +48,14 @@ export class ContextBuilder {
     return this;
   }
 
-  build(
-    factory: WriteableContextFactory = defaultWriteableContextFactory
-  ): IContext {
+  build<C extends IContext & IContextWriteable>(
+    factory: WriteableContextFactory<C>
+  ): C {
     const context = factory();
     for (const operator of this.operators) {
       operator(context);
     }
-    return context as unknown as IContext;
+    return context;
   }
 }
 

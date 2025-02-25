@@ -7,6 +7,7 @@ import {
   getReadOperatorName,
   getUpdateOperatorName,
 } from '../decorator-operators';
+import { defaultContextFactory } from '../../../context/context-builder';
 
 describe('process-manager', () => {
   describe('step', () => {
@@ -29,7 +30,7 @@ describe('process-manager', () => {
 
           const context = createContextBuilder()
             .pipe(addStepOperatorFromMetadata(ClosedStep))
-            .build();
+            .build(defaultContextFactory);
 
           const update = context.getService(getUpdateOperatorName('closed'));
 
@@ -49,7 +50,7 @@ describe('process-manager', () => {
 
           const context = createContextBuilder()
             .pipe(addStepOperatorFromMetadata(ClosedStep))
-            .build();
+            .build(defaultContextFactory);
 
           const read = context.getService(getReadOperatorName('closed'));
 
@@ -74,7 +75,7 @@ describe('process-manager', () => {
 
           const context = createContextBuilder()
             .pipe(addStepOperatorFromMetadata(ClosedStep))
-            .build();
+            .build(defaultContextFactory);
 
           const read = context.getService(getReadOperatorName('closed'));
           const update = context.getService(getUpdateOperatorName('closed'));

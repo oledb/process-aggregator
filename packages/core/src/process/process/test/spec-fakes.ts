@@ -14,6 +14,7 @@ import {
 } from '../../../context';
 import { ProcessName } from '../types';
 import { ITask, ValidationState } from '../../common';
+import { defaultContextFactory } from '../../../context/context-builder';
 
 export type ProcessFakeStatus = 'new' | 'in-progress' | 'closed';
 export type ProcessFakeCommand = 'to-work' | 'close' | 'review';
@@ -143,11 +144,11 @@ export function bootstrapFakeContext(operator: ContextOperator = (c) => c) {
       ),
       operator
     )
-    .build();
+    .build(defaultContextFactory);
 }
 
 export function bootstrapEmptyFakeContext() {
-  return createContextBuilder().build();
+  return createContextBuilder().build(defaultContextFactory);
 }
 
 export function bootstrapFakeProcess(

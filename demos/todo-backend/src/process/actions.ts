@@ -5,7 +5,6 @@ import {
   InitialAction,
   ITask,
   ITaskRepository,
-  Module,
   ProcessName,
   TASK_REPOSITORY_TOKEN,
   ValidationState,
@@ -31,6 +30,7 @@ function cleanTask(
 @InitialAction({
   processName: TODO_PROCESS_NAME,
 })
+@Injectable()
 export class InitialTodoAction
   implements IInitialTaskAction<TodoStatus, Todo, NewTodo>
 {
@@ -83,6 +83,7 @@ export class InitialTodoAction
     ['holding', 'in-progress'],
   ],
 })
+@Injectable()
 export class ToWorkAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
 
@@ -107,6 +108,7 @@ export class ToWorkAction implements IAction<TodoStatus, Todo> {
   processName: TODO_PROCESS_NAME,
   relations: [['in-progress', 'holding']],
 })
+@Injectable()
 export class HoldAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
 
@@ -131,6 +133,7 @@ export class HoldAction implements IAction<TodoStatus, Todo> {
   processName: TODO_PROCESS_NAME,
   relations: [['in-progress', 'completed']],
 })
+@Injectable()
 export class CompleteAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
 
@@ -158,6 +161,7 @@ export class CompleteAction implements IAction<TodoStatus, Todo> {
     ['completed', 'closed'],
   ],
 })
+@Injectable()
 export class CloseAction implements IAction<TodoStatus, Todo> {
   processName!: ProcessName;
   constructor(
@@ -174,14 +178,3 @@ export class CloseAction implements IAction<TodoStatus, Todo> {
     return this.todoRepository.getTask(task.id).then(cleanTask);
   }
 }
-
-@Module({
-  actions: [
-    InitialTodoAction,
-    ToWorkAction,
-    CloseAction,
-    HoldAction,
-    CompleteAction,
-  ],
-})
-export class ActionsModule {}
