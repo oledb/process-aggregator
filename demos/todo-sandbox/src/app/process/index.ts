@@ -1,1 +1,1 @@
-export * from '../root-module';
+export * from './types';

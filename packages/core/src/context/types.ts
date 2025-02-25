@@ -15,7 +15,3 @@ export interface IContext {
   getService<T>(token: string | Type<T>): T;
   tryGetService<T>(token: string | Type<T>): T | null;
 }
-
-export interface IContextBuilder {
-  build(...operators: ContextOperator[]): IContext;
-}

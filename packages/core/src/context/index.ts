@@ -6,3 +6,4 @@ export {
   addSingleton,
 } from './context-builder';
 export * from './decorators';
+export { TokenDoesNotExistException } from './context';

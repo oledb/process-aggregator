@@ -33,7 +33,9 @@ export type InitialActionMetadata = {
   processName: ProcessName;
 };
 
-export const ACTION_METADATA_PROPERTIES = Symbol('Action metadata property');
+export const ACTION_METADATA_PROPERTIES = Symbol(
+  '__action_metadata_property__'
+);
 
 export interface ActionClass<T> extends Type<T> {
   [ACTION_METADATA_PROPERTIES]?: ActionMetadata | InitialActionMetadata;

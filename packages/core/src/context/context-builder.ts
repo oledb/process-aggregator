@@ -1,4 +1,4 @@
-import { ContextOperator, IContext, IContextBuilder, Type } from './types';
+import { ContextOperator, IContext, IContextWriteable, Type } from './types';
 import { Context } from './context';
 import { isType } from './utils';
 
@@ -34,7 +34,10 @@ export function addTransient<T>(
   };
 }
 
-export class ContextBuilder implements IContextBuilder {
+export type WriteableContextFactory = () => IContextWriteable;
+const defaultWriteableContextFactory = () => new Context();
+
+export class ContextBuilder {
   private operators: ContextOperator[] = [];
 
   pipe(...operators: ContextOperator[]) {
@@ -42,8 +45,10 @@ export class ContextBuilder implements IContextBuilder {
     return this;
   }
 
-  build(): IContext {
-    const context = new Context();
+  build(
+    factory: WriteableContextFactory = defaultWriteableContextFactory
+  ): IContext {
+    const context = factory();
     for (const operator of this.operators) {
       operator(context);
     }
