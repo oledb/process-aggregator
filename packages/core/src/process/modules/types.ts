@@ -19,28 +19,19 @@ export interface ModuleProperties {
   providers?: ServiceProvider<unknown>[];
 }
 
-export const MODULE_METADATA_PROPERTY = Symbol('Module Metadata Property');
+export const MODULE_METADATA_PROPERTY = '__module_metadata_property__';
 
-export interface ModuleClass extends Type<unknown> {
-  [MODULE_METADATA_PROPERTY]?: ModuleProperties;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function isModuleClass<M extends Function>(type: M): boolean {
+  return Reflect.hasMetadata(MODULE_METADATA_PROPERTY, type);
 }
 
-export function isModuleClass<M extends ModuleClass>(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  type: Function
-): type is M {
-  return (
-    typeof type === 'function' &&
-    typeof (type as ModuleClass)[MODULE_METADATA_PROPERTY] === 'object'
-  );
-}
-
-export function asModuleClass<M extends ModuleClass>(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  type: Function
-): M {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function getModuleMetadata<M extends Function>(
+  type: M
+): ModuleProperties {
   if (isModuleClass<M>(type)) {
-    return type;
+    return Reflect.getMetadata(MODULE_METADATA_PROPERTY, type);
   }
   throw new DecoratorIsRequiredException(type.name, 'Module');
 }

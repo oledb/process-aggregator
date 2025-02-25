@@ -1,10 +1,11 @@
 import { ProcessName } from '../process';
 import {
   ACTION_METADATA_PROPERTIES,
-  ActionClass,
   IAction,
   IInitialTaskAction,
 } from './types';
+import { Type } from '../../context';
+import 'reflect-metadata';
 
 export interface ActionDecoratorProperties<S extends string, C extends string> {
   command: C;
@@ -18,13 +19,17 @@ export function Action<S extends string, C extends string>(
 ) {
   const { command, relations, processName } = properties;
 
-  return <A extends ActionClass<IAction<S, unknown>>>(target: A) => {
-    target[ACTION_METADATA_PROPERTIES] = {
-      processName,
-      command,
-      type: 'action',
-      relations: relations ?? [],
-    };
+  return <A extends Type<IAction<S, unknown>>>(target: A) => {
+    Reflect.defineMetadata(
+      ACTION_METADATA_PROPERTIES,
+      {
+        processName,
+        command,
+        type: 'action',
+        relations: relations ?? [],
+      },
+      target
+    );
     return target;
   };
 }
@@ -36,13 +41,17 @@ export interface InitialActionDecoratorProperties {
 export function InitialAction(properties: InitialActionDecoratorProperties) {
   const { processName } = properties;
 
-  return <A extends ActionClass<IInitialTaskAction<string, unknown, unknown>>>(
+  return <A extends Type<IInitialTaskAction<string, unknown, unknown>>>(
     target: A
   ) => {
-    target[ACTION_METADATA_PROPERTIES] = {
-      type: 'initial-action',
-      processName,
-    };
+    Reflect.defineMetadata(
+      ACTION_METADATA_PROPERTIES,
+      {
+        type: 'initial-action',
+        processName,
+      },
+      target
+    );
     return target;
   };
 }

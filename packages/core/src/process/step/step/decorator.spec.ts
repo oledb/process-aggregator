@@ -1,12 +1,7 @@
 import { Step } from '../decorator';
 import { ProcessName } from '../../process';
 import { getFakeReadOperator, getFakeUpdateOperator } from './spec-fakes';
-import {
-  asStepClass,
-  isStepClass,
-  STEP_METADATA_PROPERTIES,
-  StepMetadata,
-} from '../types';
+import { getStepMetadata, isStepClass, StepMetadata } from '../types';
 
 describe('process-manager', () => {
   describe('step', () => {
@@ -33,9 +28,7 @@ describe('process-manager', () => {
         class InProgressStep {}
 
         expect(isStepClass(InProgressStep)).toBeTruthy();
-        expect(
-          asStepClass(InProgressStep)[STEP_METADATA_PROPERTIES]
-        ).toEqual<StepMetadata>({
+        expect(getStepMetadata(InProgressStep)).toEqual<StepMetadata>({
           status: 'in-progress',
           processName,
           readOperator: FakeReadOperator,

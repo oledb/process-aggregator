@@ -1,6 +1,5 @@
 import { ProcessName } from '../process';
 import { ITask, ValidationState } from '../common';
-import { Type } from '../../context';
 import { DecoratorIsRequiredException } from '../exceptions';
 
 export interface IAction<S extends string, P> {
@@ -33,30 +32,19 @@ export type InitialActionMetadata = {
   processName: ProcessName;
 };
 
-export const ACTION_METADATA_PROPERTIES = Symbol(
-  '__action_metadata_property__'
-);
+export const ACTION_METADATA_PROPERTIES = '__action_metadata_property__';
 
-export interface ActionClass<T> extends Type<T> {
-  [ACTION_METADATA_PROPERTIES]?: ActionMetadata | InitialActionMetadata;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function isActionClass<T extends Function>(type: T): boolean {
+  return Reflect.hasMetadata(ACTION_METADATA_PROPERTIES, type);
 }
 
-export function isActionClass<T = unknown>(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  type: Function
-): type is ActionClass<T> {
-  return (
-    typeof type === 'function' &&
-    typeof (type as ActionClass<T>)[ACTION_METADATA_PROPERTIES] === 'object'
-  );
-}
-
-export function asActionClass<T = unknown>(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  type: Function
-): Required<ActionClass<T>> {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function getActionMetadata<T extends Function>(
+  type: T
+): ActionMetadata | InitialActionMetadata {
   if (isActionClass<T>(type)) {
-    return type as Required<ActionClass<T>>;
+    return Reflect.getMetadata(ACTION_METADATA_PROPERTIES, type);
   }
   throw new DecoratorIsRequiredException(type.name, 'Action');
 }

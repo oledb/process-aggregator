@@ -2,9 +2,8 @@ import { Action, InitialAction } from '../decorators';
 import { getFakeAction, getFakeInitialAction } from './spec-fakes';
 import { ProcessName } from '../../process';
 import {
-  ACTION_METADATA_PROPERTIES,
   ActionMetadata,
-  asActionClass,
+  getActionMetadata,
   InitialActionMetadata,
   isActionClass,
 } from '../types';
@@ -26,9 +25,7 @@ describe('process-manager', () => {
         class CloseAction extends getFakeAction<FakeStatus, FakePayload>() {}
 
         expect(isActionClass(CloseAction)).toEqual(true);
-        expect(
-          asActionClass(CloseAction)[ACTION_METADATA_PROPERTIES]
-        ).toEqual<ActionMetadata>({
+        expect(getActionMetadata(CloseAction)).toEqual<ActionMetadata>({
           command: 'close',
           processName: processNameV1,
           relations: [['active', 'closed']],
@@ -47,7 +44,7 @@ describe('process-manager', () => {
 
         expect(isActionClass(TodoInitialAction)).toBeTruthy();
         expect(
-          asActionClass(TodoInitialAction)[ACTION_METADATA_PROPERTIES]
+          getActionMetadata(TodoInitialAction)
         ).toEqual<InitialActionMetadata>({
           processName: processNameV1,
           type: 'initial-action',
@@ -68,8 +65,13 @@ describe('process-manager', () => {
       });
 
       it('asActionClass function', () => {
-        expect(asActionClass(ActionType)).toEqual(ActionType);
-        expect(() => asActionClass(NotActionType)).toThrow(
+        expect(getActionMetadata(ActionType)).toEqual({
+          type: 'action',
+          command: 'close',
+          processName: processNameV1,
+          relations: [['active', 'closed']],
+        });
+        expect(() => getActionMetadata(NotActionType)).toThrow(
           new DecoratorIsRequiredException(NotActionType.name, 'Action')
         );
       });

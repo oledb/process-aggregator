@@ -1,20 +1,19 @@
-import { ContextOperator } from '../../context';
-import { STEP_METADATA_PROPERTIES, StepClass } from './types';
+import { ContextOperator, Type } from '../../context';
+import { getStepMetadata } from './types';
 
 export function getUpdateOperatorName(status: string) {
-  return `*&${status}_update_operator&*`;
+  return `__${status}_update_operator__`;
 }
 
 export function getReadOperatorName(status: string) {
-  return `*&${status}_read_operator&*`;
+  return `__${status}_read_operator__`;
 }
 
-export function addStepOperatorFromMetadata<
-  St extends StepClass<T>,
-  T = unknown
->(type: St): ContextOperator {
+export function addStepOperatorFromMetadata<St extends Type<T>, T = unknown>(
+  type: St
+): ContextOperator {
   return (context) => {
-    const meta = type[STEP_METADATA_PROPERTIES];
+    const meta = getStepMetadata(type);
     if (!meta) {
       return context;
     }

@@ -1,6 +1,5 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { APP_SERVICE_TOKEN, AppService } from './app.service';
-import { NestFactory } from '@nestjs/core';
 
 @Controller()
 export class AppController {

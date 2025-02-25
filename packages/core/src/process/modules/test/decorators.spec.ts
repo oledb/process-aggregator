@@ -1,5 +1,5 @@
 import { Module } from '../decorators';
-import { asModuleClass, isModuleClass } from '../types';
+import { getModuleMetadata, isModuleClass } from '../types';
 import { DecoratorIsRequiredException } from '../../exceptions';
 
 describe('process-manager', () => {
@@ -16,8 +16,8 @@ describe('process-manager', () => {
       });
 
       it('asModuleClass function', () => {
-        expect(asModuleClass(MyModule)).toEqual(MyModule);
-        expect(() => asModuleClass(NotModule)).toThrow(
+        expect(getModuleMetadata(MyModule)).toEqual({});
+        expect(() => getModuleMetadata(NotModule)).toThrow(
           new DecoratorIsRequiredException(NotModule.name, 'Module')
         );
       });

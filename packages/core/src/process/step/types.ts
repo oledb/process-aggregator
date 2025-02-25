@@ -2,6 +2,7 @@ import { ProcessName } from '../process';
 import { ITask, ValidationState } from '../common';
 import { Type } from '../../context';
 import { DecoratorIsRequiredException } from '../exceptions';
+import 'reflect-metadata';
 
 export interface IStep<S extends string> {
   processName: ProcessName;
@@ -32,25 +33,17 @@ export interface StepMetadata {
   readOperator: Type<IReadOperator<string, unknown>> | null;
 }
 
-export const STEP_METADATA_PROPERTIES = Symbol('Step metadata property');
+export const STEP_METADATA_PROPERTY = '__step_metadata_property';
 
-export interface StepClass<T> extends Type<T> {
-  [STEP_METADATA_PROPERTIES]?: StepMetadata;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function isStepClass<T extends Function>(type: T): boolean {
+  return Reflect.hasMetadata(STEP_METADATA_PROPERTY, type);
 }
 
-export function isStepClass<T = unknown>(type: unknown): type is StepClass<T> {
-  return (
-    typeof type === 'function' &&
-    typeof (type as StepClass<T>)[STEP_METADATA_PROPERTIES] === 'object'
-  );
-}
-
-export function asStepClass<T = unknown>(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  type: Function
-): StepClass<T> {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function getStepMetadata<T extends Function>(type: T): StepMetadata {
   if (isStepClass<T>(type)) {
-    return type;
+    return Reflect.getMetadata(STEP_METADATA_PROPERTY, type);
   }
   throw new DecoratorIsRequiredException(type.name, 'Step');
 }

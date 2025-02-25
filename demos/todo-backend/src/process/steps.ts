@@ -9,8 +9,11 @@ import {
   TASK_REPOSITORY_TOKEN,
   ValidationState,
 } from '@oledb/process-aggregator-core';
-import { TODO_PROCESS_NAME, TodoStatus } from './types';
-import { Todo } from '../models';
+import {
+  Todo,
+  TODO_PROCESS_NAME,
+  TodoStatus,
+} from '@process-aggregator/todo-sandbox';
 
 export const updatingIsProhibited = (status: string) =>
   `Updating a task with status ${status} is prohibited`;

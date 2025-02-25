@@ -1,42 +1,33 @@
-import { ContextOperator } from '../../context';
+import { ContextOperator, Type } from '../../context';
 import { ProcessBuilderOperators } from '../process';
 import {
-  ACTION_METADATA_PROPERTIES,
-  ActionClass,
   ActionMetadata,
-  asActionClass,
+  getActionMetadata,
   INITIAL_ACTION_COMMAND,
 } from './types';
-import {
-  asModuleClass,
-  MODULE_METADATA_PROPERTY,
-  ModuleClass,
-} from '../modules';
+import { getModuleMetadata } from '../modules';
 import { UnknownErrorException } from '../exceptions';
 
 export function addRelationsAndStepsFromModule<
   S extends string,
   P,
-  C extends string,
-  M extends ModuleClass
->(module: M): ProcessBuilderOperators<S, P, C> {
+  C extends string
+>(module: Type<object>): ProcessBuilderOperators<S, P, C> {
   return (process) => {
-    const actionsMeta = (function getActionsMeta(m: M): ActionMetadata[] {
-      const meta = asModuleClass(m)[MODULE_METADATA_PROPERTY];
+    const actionsMeta = (function getActionsMeta(
+      m: Type<object>
+    ): ActionMetadata[] {
+      const meta = getModuleMetadata(m);
 
       if (!meta) {
         return [];
       }
 
       const result = (meta.actions ?? [])
-        .filter(
-          (a) => asActionClass(a)[ACTION_METADATA_PROPERTIES].type === 'action'
-        )
-        .map(
-          (a) => asActionClass(a)[ACTION_METADATA_PROPERTIES] as ActionMetadata
-        );
+        .filter((a) => getActionMetadata(a).type === 'action')
+        .map((a) => getActionMetadata(a) as ActionMetadata);
       return result.concat(
-        ...(meta.modules ?? []).map((mm) => getActionsMeta(asModuleClass(mm)))
+        ...(meta.modules ?? []).map((mm) => getActionsMeta(mm))
       );
     })(module);
 
@@ -61,11 +52,11 @@ export function addRelationsAndStepsFromModule<
   };
 }
 
-export function addActionToContext<A extends ActionClass<T>, T = unknown>(
+export function addActionToContext<A extends Type<T>, T = unknown>(
   actionType: A
 ): ContextOperator {
   return (context) => {
-    const meta = asActionClass(actionType)[ACTION_METADATA_PROPERTIES];
+    const meta = getActionMetadata(actionType);
     if (meta.type === 'action') {
       context.setTransient(meta.command, actionType);
     } else {
@@ -76,14 +67,14 @@ export function addActionToContext<A extends ActionClass<T>, T = unknown>(
 }
 
 export function addRelationAndStepToProcess<
-  A extends ActionClass<T>,
+  A extends Type<T>,
   S extends string = string,
   P = unknown,
   C extends string = string,
   T = unknown
 >(actionType: A): ProcessBuilderOperators<S, P, C> {
   return (context) => {
-    const meta = asActionClass(actionType)[ACTION_METADATA_PROPERTIES];
+    const meta = getActionMetadata(actionType);
     if (meta.type === 'action') {
       const { relations, command } = meta;
       for (const relation of relations) {
