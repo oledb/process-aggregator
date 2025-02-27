@@ -1,7 +1,11 @@
 import { RootModule } from '../app/root-module';
-import { NewTodo, Todo } from '../app';
-import { TODO_PROCESS_NAME, TodoCommand } from '../app/process/types';
-import { TodoStatus } from '../app/process/types';
+import {
+  TODO_PROCESS_NAME,
+  TodoCommand,
+  TodoStatus,
+  NewTodo,
+  Todo,
+} from '../app';
 import {
   bootstrapApplication,
   COMMAND_IS_NOT_AVAILABLE,

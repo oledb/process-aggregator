@@ -3,14 +3,9 @@ import { TodoController } from './todo.controller';
 import { RootModule } from '../../process/';
 import {
   InMemoryTaskRepository,
-  ITask,
   TASK_REPOSITORY_TOKEN,
 } from '@oledb/process-aggregator-core';
-import {
-  Todo,
-  TODO_PROCESS_NAME,
-  TodoStatus,
-} from '@process-aggregator/todo-sandbox';
+import { NewTodo, Todo, TodoStatus } from '@process-aggregator/todo-sandbox';
 
 describe('TodoController', () => {
   let testingModule: TestingModule;
@@ -41,22 +36,21 @@ describe('TodoController', () => {
   describe('createTask', () => {
     it('should create new task', async () => {
       const appController = testingModule.get<TodoController>(TodoController);
-      const payload: Todo = {
-        priority: 'medium',
-        created: null,
+      const payload: NewTodo = {
+        priority: 'high',
         text: 'New task description',
         name: 'New task name',
-        workStared: null,
       };
 
       const task = await appController.createTask(payload);
+      const { id } = task;
+      const repositoryTask = await inMemoryRepository.getTask(id);
 
-      expect(task).toEqual<ITask<TodoStatus, Todo>>({
-        id: '0',
-        status: 'new',
-        processName: TODO_PROCESS_NAME,
-        payload,
-      });
+      expect(task.status).toEqual<TodoStatus>('new');
+      expect(task.payload.name).toEqual('New task name');
+      expect(task.payload.text).toEqual('New task description');
+      expect(task.payload.priority).toEqual('high');
+      expect(repositoryTask).toEqual(task);
     });
   });
 });

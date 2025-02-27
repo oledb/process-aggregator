@@ -1,6 +1,6 @@
 import { DynamicModule, Module, Provider, Scope } from '@nestjs/common';
 import { NestPaContext } from './context';
-import { ApplicationFactory } from './application-factory';
+import { PaApplicationFactory } from './application-factory';
 import {
   InMemoryTaskRepository,
   TASK_REPOSITORY_TOKEN,
@@ -13,8 +13,8 @@ export class ProcessAggregatorModule {
     const exports: Provider[] = [
       { provide: TASK_REPOSITORY_TOKEN, useClass: InMemoryTaskRepository },
       {
-        provide: ApplicationFactory,
-        useClass: ApplicationFactory,
+        provide: PaApplicationFactory,
+        useClass: PaApplicationFactory,
         scope: Scope.TRANSIENT,
       },
     ];

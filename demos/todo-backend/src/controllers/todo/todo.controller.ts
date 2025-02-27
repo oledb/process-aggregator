@@ -3,33 +3,35 @@ import {
   Controller,
   Get,
   Inject,
+  Logger,
+  NotFoundException,
   OnModuleInit,
+  Param,
   Post,
-  Scope,
 } from '@nestjs/common';
 import {
-  BaseApplication,
   ITaskRepository,
   TASK_REPOSITORY_TOKEN,
 } from '@oledb/process-aggregator-core';
 import {
+  NewTodo,
   Todo,
   TodoCommand,
   TodoStatus,
 } from '@process-aggregator/todo-sandbox';
 import {
-  ApplicationFactory,
+  PaApplicationFactory,
   NestPaApplication,
 } from '../../nestjs/application-factory';
 
-@Controller()
+@Controller('todo')
 export class TodoController implements OnModuleInit {
   application!: NestPaApplication<TodoStatus, Todo, TodoCommand>;
 
   constructor(
     @Inject(TASK_REPOSITORY_TOKEN)
     private readonly todoRepository: ITaskRepository<TodoStatus, Todo>,
-    private readonly factory: ApplicationFactory
+    private readonly factory: PaApplicationFactory
   ) {}
 
   async onModuleInit() {
@@ -45,8 +47,31 @@ export class TodoController implements OnModuleInit {
     return this.todoRepository.getTasks();
   }
 
+  @Get(':id')
+  async getTask(@Param('id') id: string) {
+    const task = await this.todoRepository.getTask(id);
+    if (task === null) {
+      Logger.error(`Task with id ${id} does not exist`);
+      throw new NotFoundException(`Task with id ${id} does not exist`);
+    }
+    return task;
+  }
+
   @Post()
-  async createTask(@Body() payload: Todo) {
+  async createTask(@Body() payload: NewTodo) {
     return this.application.createTask(payload);
+  }
+
+  @Get(':id/command')
+  async getCommands(@Param('id') id: string) {
+    return await this.application.getTaskCommands(id);
+  }
+
+  @Post(':id/invoke/:command')
+  async invokeCommand(
+    @Param('id') id: string,
+    @Param('command') command: TodoCommand
+  ) {
+    return await this.application.invokeCommand(id, command);
   }
 }

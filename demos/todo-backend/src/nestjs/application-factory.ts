@@ -1,5 +1,5 @@
 import { NestPaContext, setupNestContext } from './context';
-import { Inject, Injectable, OnModuleInit, Scope, Type } from '@nestjs/common';
+import { Inject, Injectable, Type } from '@nestjs/common';
 import {
   ActionMetadata,
   BaseApplication,
@@ -24,7 +24,7 @@ export class NestPaApplication<
 > extends BaseApplication<S, P, C> {}
 
 @Injectable()
-export class ApplicationFactory implements OnModuleInit {
+export class PaApplicationFactory {
   constructor(
     private readonly nestContext: NestPaContext,
     @Inject(TASK_REPOSITORY_TOKEN)
@@ -36,10 +36,6 @@ export class ApplicationFactory implements OnModuleInit {
 
   private context: NestPaContext | null = null;
   private process: IProcess<string, unknown, string> | null = null;
-
-  onModuleInit(): void {
-    // this.createProcess(this.moduleRef);
-  }
 
   async createProcess(ref: ModuleRef) {
     this.context = createContextBuilder()
@@ -57,9 +53,6 @@ export class ApplicationFactory implements OnModuleInit {
     BaseApplication<S, P, C>
   > {
     await this.createProcess(this.moduleRef);
-    if (this.process === null) {
-      throw new Error('IProcess is not initialized');
-    }
     return new NestPaApplication<S, P, C>(
       this.process as IProcess<S, P, C>,
       this.repository as ITaskRepository<S, P>
