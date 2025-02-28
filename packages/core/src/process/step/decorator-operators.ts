@@ -9,7 +9,7 @@ export function getReadOperatorName(status: string) {
   return `__${status}_read_operator__`;
 }
 
-export function addStepOperatorFromMetadata<St extends Type<T>, T = unknown>(
+export function addStepOperatorsFromType<St extends Type<T>, T = unknown>(
   type: St
 ): ContextOperator {
   return (context) => {

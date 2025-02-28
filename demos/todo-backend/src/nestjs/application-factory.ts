@@ -7,7 +7,7 @@ import {
   createProcessBuilder,
   getActionMetadata,
   getProcessFactory,
-  getRelationsAndSteps,
+  addRelationsAndStepsFromMetadata,
   IProcess,
   ITaskRepository,
   ProcessBuilderOperators,
@@ -67,5 +67,7 @@ export function getRelationsAndStepFromActions(
     .map(getActionMetadata)
     .filter((m) => m.type === 'action') as ActionMetadata[];
   return (process) =>
-    getRelationsAndSteps<string, unknown, string>(actionsMeta)(process);
+    addRelationsAndStepsFromMetadata<string, unknown, string>(actionsMeta)(
+      process
+    );
 }

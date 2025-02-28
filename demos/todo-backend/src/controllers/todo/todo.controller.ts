@@ -3,13 +3,14 @@ import {
   Controller,
   Get,
   Inject,
-  Logger,
   NotFoundException,
   OnModuleInit,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import {
+  ITask,
   ITaskRepository,
   TASK_REPOSITORY_TOKEN,
 } from '@oledb/process-aggregator-core';
@@ -51,7 +52,6 @@ export class TodoController implements OnModuleInit {
   async getTask(@Param('id') id: string) {
     const task = await this.todoRepository.getTask(id);
     if (task === null) {
-      Logger.error(`Task with id ${id} does not exist`);
       throw new NotFoundException(`Task with id ${id} does not exist`);
     }
     return task;
@@ -60,6 +60,11 @@ export class TodoController implements OnModuleInit {
   @Post()
   async createTask(@Body() payload: NewTodo) {
     return this.application.createTask(payload);
+  }
+
+  @Put(':id/payload')
+  async updateTask(@Param('id') id: string, @Body() payload: Todo) {
+    return (await this.application.updateTask(id, payload)).payload;
   }
 
   @Get(':id/command')

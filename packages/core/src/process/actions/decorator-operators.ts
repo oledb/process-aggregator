@@ -31,13 +31,15 @@ export function addRelationsAndStepsFromModule<
       );
     })(module);
 
-    return getRelationsAndSteps<S, P, C>(actionsMeta)(process);
+    return addRelationsAndStepsFromMetadata<S, P, C>(actionsMeta)(process);
   };
 }
 
-export function getRelationsAndSteps<S extends string, P, C extends string>(
-  actionsMeta: ActionMetadata[]
-): ProcessBuilderOperators<S, P, C> {
+export function addRelationsAndStepsFromMetadata<
+  S extends string,
+  P,
+  C extends string
+>(actionsMeta: ActionMetadata[]): ProcessBuilderOperators<S, P, C> {
   return (process) => {
     const steps = new Set<S>();
     const relations: [S, S, C][] = [];

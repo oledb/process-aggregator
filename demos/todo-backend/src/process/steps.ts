@@ -1,10 +1,8 @@
 import {
-  Inject,
   IReadOperator,
   ITask,
   ITaskRepository,
   IUpdateOperator,
-  Module,
   Step,
   TASK_REPOSITORY_TOKEN,
   ValidationState,
@@ -14,6 +12,7 @@ import {
   TODO_PROCESS_NAME,
   TodoStatus,
 } from '@process-aggregator/todo-sandbox';
+import { Inject, Injectable } from '@nestjs/common';
 
 export const updatingIsProhibited = (status: string) =>
   `Updating a task with status ${status} is prohibited`;
@@ -21,6 +20,7 @@ export const updatingIsProhibited = (status: string) =>
 export const readIsProhibited = (status: string) =>
   `Reading a task with status ${status} is prohibited`;
 
+@Injectable()
 export class OperatorProhibitingUpdate
   implements IUpdateOperator<TodoStatus, Todo>
 {
@@ -39,6 +39,7 @@ export class OperatorProhibitingUpdate
   }
 }
 
+@Injectable()
 export class DefaultUpdateOperator
   implements IUpdateOperator<TodoStatus, Todo>
 {
@@ -61,6 +62,7 @@ export class DefaultUpdateOperator
   }
 }
 
+@Injectable()
 export class OperatorProhibitingRead
   implements IReadOperator<TodoStatus, Todo>
 {
@@ -106,8 +108,3 @@ export class CompletedStep {}
   readOperator: OperatorProhibitingRead,
 })
 export class ClosedStep {}
-
-@Module({
-  steps: [NewStep, InProgressStep, HoldingStep, CompletedStep, ClosedStep],
-})
-export class StepsModule {}

@@ -6,7 +6,7 @@ import {
 } from '../../context';
 import { addActionToContext, ICommonAction } from '../actions';
 import { getModuleMetadata, ServiceProvider } from './types';
-import { addStepOperatorFromMetadata } from '../step';
+import { addStepOperatorsFromType } from '../step';
 import { defaultContextFactory } from '../../context/context-builder';
 
 export function bootstrapContext(module: Type<unknown>): IContext {
@@ -42,7 +42,7 @@ export function bootstrapContext(module: Type<unknown>): IContext {
         return addSingleton(p.token, p.type);
       }),
       ...getActions(module).map(addActionToContext),
-      ...getSteps(module).map(addStepOperatorFromMetadata)
+      ...getSteps(module).map(addStepOperatorsFromType)
     )
     .build(defaultContextFactory);
 }

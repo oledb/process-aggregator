@@ -1,5 +1,9 @@
 import { DynamicModule, Module, Provider, Scope } from '@nestjs/common';
-import { NestPaContext } from './context';
+import {
+  addActionsProvider,
+  getStepsProviders,
+  NestPaContext,
+} from './context';
 import { PaApplicationFactory } from './application-factory';
 import {
   InMemoryTaskRepository,
@@ -22,10 +26,8 @@ export class ProcessAggregatorModule {
     return {
       module: ProcessAggregatorModule,
       providers: [
-        ...(options.actions ?? []).map(
-          (a) =>
-            ({ provide: a, useClass: a, scope: Scope.TRANSIENT } as Provider)
-        ),
+        ...addActionsProvider(options.actions ?? []),
+        ...getStepsProviders(options.steps ?? []),
         { provide: PA_MODULE_OPTIONS_TOKEN, useValue: options },
         {
           provide: NestPaContext,

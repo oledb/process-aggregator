@@ -8,6 +8,13 @@ import {
   InitialTodoAction,
   ToWorkAction,
 } from './actions';
+import {
+  ClosedStep,
+  CompletedStep,
+  HoldingStep,
+  InProgressStep,
+  NewStep,
+} from './steps';
 
 const paModule = ProcessAggregatorModule.register({
   processName: TODO_PROCESS_NAME,
@@ -18,6 +25,7 @@ const paModule = ProcessAggregatorModule.register({
     HoldAction,
     CompleteAction,
   ],
+  steps: [NewStep, InProgressStep, HoldingStep, CompletedStep, ClosedStep],
 });
 
 @Module({

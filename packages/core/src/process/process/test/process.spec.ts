@@ -17,7 +17,7 @@ import { addInitialAction } from '../../process-builder';
 import { createContextBuilder, IContext } from '../../../context';
 import { IRelationWeight, ITask, ValidationState } from '../../common';
 import {
-  addStepOperatorFromMetadata,
+  addStepOperatorsFromType,
   IReadOperator,
   IStep,
   IUpdateOperator,
@@ -409,7 +409,7 @@ describe('process-manager', () => {
             })
             class InProgressStep {}
 
-            return addStepOperatorFromMetadata(InProgressStep)(c);
+            return addStepOperatorsFromType(InProgressStep)(c);
           })
         );
       });
@@ -476,7 +476,7 @@ describe('process-manager', () => {
             })
             class InProgressStep {}
 
-            return addStepOperatorFromMetadata(InProgressStep)(c);
+            return addStepOperatorsFromType(InProgressStep)(c);
           })
         );
       });

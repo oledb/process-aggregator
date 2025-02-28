@@ -1,13 +1,17 @@
 import {
+  addStepOperatorsFromType,
   ContextOperator,
   getActionMetadata,
+  getReadOperatorName,
+  getStepMetadata,
+  getUpdateOperatorName,
   IContext,
   IContextWriteable,
   INITIAL_ACTION_COMMAND,
   TokenDoesNotExistException,
   Type,
 } from '@oledb/process-aggregator-core';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Provider, Scope } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { PaModuleOptions } from './types';
 
@@ -23,7 +27,7 @@ export class NestPaContext implements IContext, IContextWriteable {
     for (const provider of this.providers) {
       this.instances.set(
         provider.token,
-        await moduleRef.resolve(provider.type)
+        await moduleRef.resolve(provider.token)
       );
     }
   }
@@ -46,6 +50,7 @@ export class NestPaContext implements IContext, IContextWriteable {
     }
     return instance as T;
   }
+
   tryGetService<T>(token: string | Type<T>): T | null {
     return (this.instances.get(token) as T) ?? null;
   }
@@ -72,6 +77,53 @@ export function setupNestContext(options: PaModuleOptions): ContextOperator {
         context.setTransient(INITIAL_ACTION_COMMAND, action);
       }
     }
+
+    const steps = options.steps ?? [];
+    for (const step of steps) {
+      addStepOperatorsFromType(step)(context);
+    }
     return context;
   };
+}
+
+export function getStepsProviders(steps: Type<unknown>[]) {
+  return steps
+    .map((step) => {
+      const meta = getStepMetadata(step);
+      const providers: Provider[] = [];
+      if (meta.updateOperator) {
+        providers.push({
+          provide: getUpdateOperatorName(meta.status),
+          useClass: meta.updateOperator,
+          scope: Scope.TRANSIENT,
+        });
+      }
+      if (meta.readOperator) {
+        providers.push({
+          provide: getReadOperatorName(meta.status),
+          useClass: meta.readOperator,
+          scope: Scope.TRANSIENT,
+        });
+      }
+      return providers;
+    })
+    .flat();
+}
+
+export function addActionsProvider(actions: Type<unknown>[]) {
+  return actions.map((action) => {
+    const meta = getActionMetadata(action);
+    if (meta.type === 'initial-action') {
+      return {
+        provide: INITIAL_ACTION_COMMAND,
+        useClass: action,
+        scope: Scope.TRANSIENT,
+      } as Provider;
+    }
+    return {
+      provide: meta.command,
+      useClass: action,
+      scope: Scope.TRANSIENT,
+    } as Provider;
+  });
 }
