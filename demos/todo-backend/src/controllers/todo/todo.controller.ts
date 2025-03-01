@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Inject,
   NotFoundException,
   OnModuleInit,
@@ -10,9 +11,10 @@ import {
   Put,
 } from '@nestjs/common';
 import {
-  ITask,
   ITaskRepository,
   TASK_REPOSITORY_TOKEN,
+  TaskNotFoundException,
+  ValidationException,
 } from '@oledb/process-aggregator-core';
 import {
   NewTodo,
@@ -43,33 +45,19 @@ export class TodoController implements OnModuleInit {
     >();
   }
 
-  @Get()
-  getTasks() {
-    return this.todoRepository.getTasks();
-  }
-
-  @Get(':id')
-  async getTask(@Param('id') id: string) {
-    const task = await this.todoRepository.getTask(id);
-    if (task === null) {
-      throw new NotFoundException(`Task with id ${id} does not exist`);
-    }
-    return task;
-  }
-
   @Post()
   async createTask(@Body() payload: NewTodo) {
-    return this.application.createTask(payload);
-  }
-
-  @Put(':id/payload')
-  async updateTask(@Param('id') id: string, @Body() payload: Todo) {
-    return (await this.application.updateTask(id, payload)).payload;
-  }
-
-  @Get(':id/command')
-  async getCommands(@Param('id') id: string) {
-    return await this.application.getTaskCommands(id);
+    try {
+      return this.application.createTask(payload);
+    } catch (e) {
+      if (e instanceof ValidationException) {
+        throw new HttpException(e.message, 400);
+      }
+      if (e instanceof TaskNotFoundException) {
+        throw new NotFoundException(e.message);
+      }
+      throw new HttpException('Internal error', 500);
+    }
   }
 
   @Post(':id/invoke/:command')
@@ -78,5 +66,52 @@ export class TodoController implements OnModuleInit {
     @Param('command') command: TodoCommand
   ) {
     return await this.application.invokeCommand(id, command);
+  }
+
+  @Get(':id/command')
+  async getCommands(@Param('id') id: string) {
+    try {
+      return await this.application.getTaskCommands(id);
+    } catch (e) {
+      if (e instanceof TaskNotFoundException) {
+        throw new NotFoundException(`Task id ${id} not found`);
+      }
+      throw e;
+    }
+  }
+
+  @Get()
+  getTasks() {
+    return this.todoRepository.getTasks();
+  }
+
+  @Get(':id')
+  async getTask(@Param('id') id: string) {
+    try {
+      return await this.application.getTask(id);
+    } catch (e) {
+      if (e instanceof ValidationException) {
+        throw new HttpException(e.message, 400);
+      }
+      if (e instanceof TaskNotFoundException) {
+        throw new NotFoundException(`Task id ${id} not found`);
+      }
+      throw e;
+    }
+  }
+
+  @Put(':id/payload')
+  async updateTask(@Param('id') id: string, @Body() payload: Todo) {
+    try {
+      return (await this.application.updateTask(id, payload)).payload;
+    } catch (e) {
+      if (e instanceof ValidationException) {
+        throw new HttpException(e.message, 400);
+      }
+      if (e instanceof TaskNotFoundException) {
+        throw new NotFoundException(`Task id ${id} not found`);
+      }
+      throw e;
+    }
   }
 }

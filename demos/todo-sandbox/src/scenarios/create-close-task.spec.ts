@@ -18,11 +18,11 @@ describe('todo-sandbox', () => {
     RootModule,
     TODO_PROCESS_NAME
   );
-  async function itChecksTasksIsEmpty() {
+  it('should checks that tasks list is empty', async () => {
     expect(await app.getTasks()).toEqual([]);
-  }
+  });
 
-  async function itFailedToCreateEssayTask() {
+  it('should create new task with exception', async () => {
     const newTodo: NewTodo = {
       name: 'Write essay',
       text: '',
@@ -35,11 +35,11 @@ describe('todo-sandbox', () => {
     const tasks = await app.getTasks();
 
     expect(tasks).toEqual([]);
-  }
+  });
 
   let essayTaskId = '';
 
-  async function itCreatesEssayTaskWithIncorrectName() {
+  it('should create essay task with incorrect name', async () => {
     const newTodo: NewTodo = {
       name: 'Write essy',
       text: 'Essay size is about 5000 chars without spaces',
@@ -52,9 +52,9 @@ describe('todo-sandbox', () => {
     expect(taskFromRepository).not.toBeNull();
     expect(taskCreated.status).toEqual<TodoStatus>('new');
     expect(taskFromRepository).toEqual(taskCreated);
-  }
+  });
 
-  async function itMovesEssayTaskToWork() {
+  it('should move essay task to work', async () => {
     let task = await app.getTask(essayTaskId);
     expect(task?.status).toEqual('new');
 
@@ -66,9 +66,9 @@ describe('todo-sandbox', () => {
 
     expect(task.status).toEqual<TodoStatus>('in-progress');
     expect(inProgressTask).toEqual(task);
-  }
+  });
 
-  async function itUpdatesEssayTaskName() {
+  it('should update essay task name', async () => {
     const task = await app.getTask(essayTaskId);
     if (task === null) {
       throw new Error('Task not found');
@@ -82,17 +82,17 @@ describe('todo-sandbox', () => {
 
     expect(result.payload.name).toEqual('Write essay');
     expect(essayTask?.payload.name).toEqual('Write essay');
-  }
+  });
 
-  async function itMovesEssayTaskToWorkAgainAndGetError() {
+  it('should move essay task to work and get error', async () => {
     await expect(() =>
       app.invokeCommand(essayTaskId, 'to-work')
     ).rejects.toThrow(
       new CommandValidationException('to-work', COMMAND_IS_NOT_AVAILABLE)
     );
-  }
+  });
 
-  async function itMovesEssayTaskToHold() {
+  it('should hold essay task', async () => {
     let task = await app.getTask(essayTaskId);
     expect(task?.status).toEqual<TodoStatus>('in-progress');
 
@@ -104,9 +104,9 @@ describe('todo-sandbox', () => {
 
     expect(task.status).toEqual<TodoStatus>('holding');
     expect(holdingTask).toEqual(task);
-  }
+  });
 
-  async function itMovesEssayTaskFromHoldingToWorking() {
+  it('should move holding task to work', async () => {
     let task = await app.getTask(essayTaskId);
     expect(task?.status).toEqual<TodoStatus>('holding');
 
@@ -118,11 +118,11 @@ describe('todo-sandbox', () => {
 
     expect(task.status).toEqual<TodoStatus>('in-progress');
     expect(inProgressTask).toEqual(task);
-  }
+  });
 
   let textbookTaskId = '';
 
-  async function itCreatesTextbookTask() {
+  it('should create textbook task', async () => {
     const newTodo: NewTodo = {
       name: 'Read the textbook',
       text: 'Read 20 pages a day',
@@ -135,9 +135,9 @@ describe('todo-sandbox', () => {
     expect(taskFromRepository).not.toBeNull();
     expect(taskCreated.status).toEqual<TodoStatus>('new');
     expect(taskFromRepository).toEqual(taskCreated);
-  }
+  });
 
-  async function itClosesTextbookTask() {
+  it('should close textbook task', async () => {
     let task = await app.getTask(textbookTaskId);
     expect(task?.status).toEqual<TodoStatus>('new');
 
@@ -147,9 +147,9 @@ describe('todo-sandbox', () => {
     task = await app.invokeCommand(textbookTaskId, 'close');
 
     expect(task.status).toEqual<TodoStatus>('closed');
-  }
+  });
 
-  async function itInvokesIncorrectCommandForTextbookTask() {
+  it('should invoke incorrect command for textbook task', async () => {
     const commands = await app.getTaskCommands(textbookTaskId);
     expect(commands).toEqual<TodoCommand[]>([]);
 
@@ -158,9 +158,9 @@ describe('todo-sandbox', () => {
     ).rejects.toThrow(
       new CommandValidationException('to-work', COMMAND_IS_NOT_AVAILABLE)
     );
-  }
+  });
 
-  async function itMovesEssayTaskToCompleteStatus() {
+  it('should complete essay task', async () => {
     let task = await app.getTask(essayTaskId);
     expect(task?.status).toEqual<TodoStatus>('in-progress');
 
@@ -172,9 +172,9 @@ describe('todo-sandbox', () => {
 
     expect(task.status).toEqual<TodoStatus>('completed');
     expect(completedTask).toEqual(task);
-  }
+  });
 
-  async function itMovesEssayTaskToClosedStatus() {
+  it('should close essay task', async () => {
     let task = await app.getTask(essayTaskId);
     expect(task?.status).toEqual<TodoStatus>('completed');
 
@@ -184,9 +184,9 @@ describe('todo-sandbox', () => {
     task = await app.invokeCommand(essayTaskId, 'close');
 
     expect(task.status).toEqual<TodoStatus>('closed');
-  }
+  });
 
-  async function itTriesToUpdateEssayTask() {
+  it('should failed to update essay task', async () => {
     const fixedTodo: Todo = {
       name: '[Failed] Write essay',
       text: '=(',
@@ -198,29 +198,11 @@ describe('todo-sandbox', () => {
     await expect(() => app.updateTask(essayTaskId, fixedTodo)).rejects.toThrow(
       updatingIsProhibited('closed')
     );
-  }
+  });
 
-  async function itTriesToReadEssayTask() {
+  it('should failed to read essay task', async () => {
     await expect(() => app.getTask(essayTaskId)).rejects.toThrow(
       readIsProhibited('closed')
     );
-  }
-
-  it('create-close-task scenario', async () => {
-    await itChecksTasksIsEmpty();
-    await itFailedToCreateEssayTask();
-    await itCreatesEssayTaskWithIncorrectName();
-    await itUpdatesEssayTaskName();
-    await itMovesEssayTaskToWork();
-    await itMovesEssayTaskToWorkAgainAndGetError();
-    await itMovesEssayTaskToHold();
-    await itMovesEssayTaskFromHoldingToWorking();
-    await itCreatesTextbookTask();
-    await itClosesTextbookTask();
-    await itInvokesIncorrectCommandForTextbookTask();
-    await itMovesEssayTaskToCompleteStatus();
-    await itMovesEssayTaskToClosedStatus();
-    await itTriesToUpdateEssayTask();
-    await itTriesToReadEssayTask();
   });
 });

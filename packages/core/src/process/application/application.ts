@@ -10,7 +10,10 @@ export class BaseApplication<S extends string, P, C extends string> {
   async createTask<IS>(newTodo: IS) {
     const validationResult = await this.process.validateInitialState(newTodo);
     if (validationResult.valid === 'false') {
-      throw new Error(validationResult.errorMessage);
+      throw new ValidationException(
+        '"initial task"',
+        validationResult.errorMessage ?? 'Error'
+      );
     }
     return this.process.createInitialTask(newTodo);
   }
@@ -57,9 +60,12 @@ export class BaseApplication<S extends string, P, C extends string> {
     if (!task) {
       throw new TaskNotFoundException(taskId);
     }
-    const validateState = await this.process.validateReadOperation(task);
-    if (validateState.valid === 'false') {
-      throw new Error(validateState.errorMessage ?? 'Error');
+    const validationState = await this.process.validateReadOperation(task);
+    if (validationState.valid === 'false') {
+      throw new ValidationException(
+        taskId,
+        validationState.errorMessage ?? 'Error'
+      );
     }
     return this.taskRepository.getTask(taskId);
   }
@@ -73,13 +79,22 @@ export class BaseApplication<S extends string, P, C extends string> {
     if (validationState.valid === 'true') {
       return this.process.updateTask(task, payload);
     }
-    throw new Error(validationState.errorMessage ?? 'Error');
+    throw new ValidationException(
+      taskId,
+      validationState.errorMessage ?? 'Error'
+    );
   }
 }
 
 export class TaskNotFoundException extends Error {
   constructor(taskId: string) {
     super(`Task with id "${taskId}" not found`);
+  }
+}
+
+export class ValidationException extends Error {
+  constructor(taskId: string, message: string) {
+    super(`Task ${taskId} validation error. ${message}`);
   }
 }
 

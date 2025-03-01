@@ -16,6 +16,11 @@
         "format": ["cjs"],
         "generatePackageJson": true
       }
+    },
+    "test": {
+      "options": {
+        "runInBand": true
+      }
     }
   }
 }
