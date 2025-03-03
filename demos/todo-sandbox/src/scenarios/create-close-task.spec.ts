@@ -22,7 +22,7 @@ describe('todo-sandbox', () => {
     expect(await app.getTasks()).toEqual([]);
   });
 
-  it('should create new task with exception', async () => {
+  it('should try to create essay task', async () => {
     const newTodo: NewTodo = {
       name: 'Write essay',
       text: '',
@@ -39,7 +39,7 @@ describe('todo-sandbox', () => {
 
   let essayTaskId = '';
 
-  it('should create essay task with incorrect name', async () => {
+  it('should create essay task', async () => {
     const newTodo: NewTodo = {
       name: 'Write essy',
       text: 'Essay size is about 5000 chars without spaces',

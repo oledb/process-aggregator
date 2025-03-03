@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   Inject,
+  Logger,
   NotFoundException,
   OnModuleInit,
   Param,
@@ -11,6 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import {
+  CommandValidationException,
   ITaskRepository,
   TASK_REPOSITORY_TOKEN,
   TaskNotFoundException,
@@ -48,7 +50,7 @@ export class TodoController implements OnModuleInit {
   @Post()
   async createTask(@Body() payload: NewTodo) {
     try {
-      return this.application.createTask(payload);
+      return await this.application.createTask(payload);
     } catch (e) {
       if (e instanceof ValidationException) {
         throw new HttpException(e.message, 400);
@@ -65,7 +67,17 @@ export class TodoController implements OnModuleInit {
     @Param('id') id: string,
     @Param('command') command: TodoCommand
   ) {
-    return await this.application.invokeCommand(id, command);
+    try {
+      return await this.application.invokeCommand(id, command);
+    } catch (e) {
+      if (e instanceof TaskNotFoundException) {
+        throw new NotFoundException(`Task id ${id} not found`);
+      }
+      if (e instanceof CommandValidationException) {
+        throw new HttpException(e.message, 400);
+      }
+      throw e;
+    }
   }
 
   @Get(':id/command')

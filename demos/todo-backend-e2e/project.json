@@ -11,8 +11,7 @@
         "jestConfig": "demos/todo-backend-e2e/jest.config.ts",
         "passWithNoTests": true,
         "runInBand": true
-      },
-      "dependsOn": ["todo-backend:build"]
+      }
     }
   }
 }
