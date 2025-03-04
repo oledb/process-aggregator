@@ -11,6 +11,7 @@ import {
   Put,
 } from '@nestjs/common';
 import {
+  BaseApplication,
   CommandValidationException,
   ITaskRepository,
   TASK_REPOSITORY_TOKEN,
@@ -24,10 +25,6 @@ import {
   TodoStatus,
 } from '@process-aggregator/todo-sandbox';
 import {
-  PaApplicationFactory,
-  NestPaApplication,
-} from '../../nestjs/application-factory';
-import {
   ApiBody,
   ApiNotFoundResponse,
   ApiParam,
@@ -39,10 +36,11 @@ import {
   TodoCommandEnum,
   TodoTaskSwagger,
 } from './todo.swagger';
+import { PaApplicationFactory } from '@oledb/process-aggregator-nest';
 
 @Controller('todo')
 export class TodoController implements OnModuleInit {
-  application!: NestPaApplication<TodoStatus, Todo, TodoCommand>;
+  application!: BaseApplication<TodoStatus, Todo, TodoCommand>;
 
   constructor(
     @Inject(TASK_REPOSITORY_TOKEN)

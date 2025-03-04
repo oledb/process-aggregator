@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TodoController } from './todo.controller';
-import { RootModule } from '../../process/';
 import {
   InMemoryTaskRepository,
   ITask,
@@ -14,6 +13,19 @@ import {
   TodoStatus,
 } from '@process-aggregator/todo-sandbox';
 import { HttpException, NotFoundException } from '@nestjs/common';
+import { ProcessAggregatorModule } from '@oledb/process-aggregator-nest';
+import {
+  CloseAction,
+  ClosedStep,
+  CompleteAction,
+  CompletedStep,
+  HoldAction,
+  HoldingStep,
+  InitialTodoAction,
+  InProgressStep,
+  NewStep,
+  ToWorkAction,
+} from '../../process';
 
 describe('TodoController', () => {
   let testingModule: TestingModule;
@@ -23,7 +35,25 @@ describe('TodoController', () => {
   beforeAll(async () => {
     testingModule = await Test.createTestingModule({
       controllers: [TodoController],
-      imports: [RootModule],
+      imports: [
+        ProcessAggregatorModule.register({
+          processName: TODO_PROCESS_NAME,
+          actions: [
+            InitialTodoAction,
+            ToWorkAction,
+            CloseAction,
+            HoldAction,
+            CompleteAction,
+          ],
+          steps: [
+            NewStep,
+            InProgressStep,
+            HoldingStep,
+            CompletedStep,
+            ClosedStep,
+          ],
+        }),
+      ],
     }).compile();
     await testingModule.createNestApplication().init();
     inMemoryRepository = testingModule.get<

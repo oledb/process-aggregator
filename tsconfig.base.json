@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@oledb/process-aggregator-core": ["packages/core/src/index.ts"],
+      "@oledb/process-aggregator-nest": ["packages/nest/src/index.ts"],
       "@process-aggregator/todo-sandbox": ["demos/todo-sandbox/src/index.ts"]
     }
   },

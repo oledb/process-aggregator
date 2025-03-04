@@ -12,16 +12,10 @@ import {
   ITaskRepository,
   ProcessBuilderOperators,
   TASK_REPOSITORY_TOKEN,
+  InitialActionMetadata,
 } from '@oledb/process-aggregator-core';
 import { PA_MODULE_OPTIONS_TOKEN, PaModuleOptions } from './types';
 import { ModuleRef } from '@nestjs/core';
-
-@Injectable()
-export class NestPaApplication<
-  S extends string,
-  P,
-  C extends string
-> extends BaseApplication<S, P, C> {}
 
 @Injectable()
 export class PaApplicationFactory {
@@ -53,7 +47,7 @@ export class PaApplicationFactory {
     BaseApplication<S, P, C>
   > {
     await this.createProcess(this.moduleRef);
-    return new NestPaApplication<S, P, C>(
+    return new BaseApplication<S, P, C>(
       this.process as IProcess<S, P, C>,
       this.repository as ITaskRepository<S, P>
     );
@@ -65,7 +59,9 @@ export function getRelationsAndStepFromActions(
 ): ProcessBuilderOperators<string, unknown, string> {
   const actionsMeta = (actions ?? [])
     .map(getActionMetadata)
-    .filter((m) => m.type === 'action') as ActionMetadata[];
+    .filter(
+      (m: ActionMetadata | InitialActionMetadata) => m.type === 'action'
+    ) as ActionMetadata[];
   return (process) =>
     addRelationsAndStepsFromMetadata<string, unknown, string>(actionsMeta)(
       process

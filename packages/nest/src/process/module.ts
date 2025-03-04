@@ -1,4 +1,4 @@
-import { DynamicModule, Module, Provider, Scope } from '@nestjs/common';
+import { DynamicModule, Module, Provider, Scope, Type } from '@nestjs/common';
 import {
   addActionsProvider,
   getStepsProviders,
@@ -7,22 +7,31 @@ import {
 import { PaApplicationFactory } from './application-factory';
 import {
   InMemoryTaskRepository,
+  ITaskRepository,
   TASK_REPOSITORY_TOKEN,
 } from '@oledb/process-aggregator-core';
 import { PA_MODULE_OPTIONS_TOKEN, PaModuleOptions } from './types';
 
+export function provideTaskRepository(
+  repository?: Type<ITaskRepository<string, unknown>>
+): Provider {
+  return {
+    provide: TASK_REPOSITORY_TOKEN,
+    useClass: repository ?? InMemoryTaskRepository,
+  };
+}
+
+export function provideApplicationFactory(): Provider {
+  return {
+    provide: PaApplicationFactory,
+    useClass: PaApplicationFactory,
+    scope: Scope.TRANSIENT,
+  };
+}
+
 @Module({})
 export class ProcessAggregatorModule {
   static register(options: PaModuleOptions): DynamicModule {
-    const exports: Provider[] = [
-      { provide: TASK_REPOSITORY_TOKEN, useClass: InMemoryTaskRepository },
-      {
-        provide: PaApplicationFactory,
-        useClass: PaApplicationFactory,
-        scope: Scope.TRANSIENT,
-      },
-    ];
-
     return {
       module: ProcessAggregatorModule,
       providers: [
@@ -34,9 +43,13 @@ export class ProcessAggregatorModule {
           useClass: NestPaContext,
           scope: Scope.TRANSIENT,
         },
-        ...exports,
+        provideTaskRepository(options.taskRepository),
+        provideApplicationFactory(),
       ],
-      exports,
+      exports: [
+        provideTaskRepository(options.taskRepository),
+        provideApplicationFactory(),
+      ],
     };
   }
 }
