@@ -4,7 +4,6 @@ import {
   Get,
   HttpException,
   Inject,
-  Logger,
   NotFoundException,
   OnModuleInit,
   Param,
@@ -28,6 +27,18 @@ import {
   PaApplicationFactory,
   NestPaApplication,
 } from '../../nestjs/application-factory';
+import {
+  ApiBody,
+  ApiNotFoundResponse,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
+import {
+  ErrorModelSwagger,
+  NewTodoSwagger,
+  TodoCommandEnum,
+  TodoTaskSwagger,
+} from './todo.swagger';
 
 @Controller('todo')
 export class TodoController implements OnModuleInit {
@@ -48,6 +59,14 @@ export class TodoController implements OnModuleInit {
   }
 
   @Post()
+  @ApiBody({ type: NewTodoSwagger })
+  @ApiResponse({ type: TodoTaskSwagger, status: 200 })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation exception',
+    type: ErrorModelSwagger,
+  })
+  // Creates a task and starts a process for it.
   async createTask(@Body() payload: NewTodo) {
     try {
       return await this.application.createTask(payload);
@@ -55,14 +74,23 @@ export class TodoController implements OnModuleInit {
       if (e instanceof ValidationException) {
         throw new HttpException(e.message, 400);
       }
-      if (e instanceof TaskNotFoundException) {
-        throw new NotFoundException(e.message);
-      }
-      throw new HttpException('Internal error', 500);
+      throw e;
     }
   }
 
   @Post(':id/invoke/:command')
+  @ApiResponse({ type: TodoTaskSwagger, status: 200 })
+  @ApiResponse({
+    status: 400,
+    description: 'Command validation exception',
+    type: ErrorModelSwagger,
+  })
+  @ApiNotFoundResponse({
+    type: ErrorModelSwagger,
+    description: 'Task not found exception',
+  })
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  @ApiParam({ name: 'command', enum: TodoCommandEnum, required: true })
   async invokeCommand(
     @Param('id') id: string,
     @Param('command') command: TodoCommand
@@ -81,6 +109,13 @@ export class TodoController implements OnModuleInit {
   }
 
   @Get(':id/command')
+  @ApiResponse({ type: [String], status: 200 })
+  @ApiResponse({ type: TodoTaskSwagger, status: 200 })
+  @ApiNotFoundResponse({
+    type: ErrorModelSwagger,
+    description: 'Task not found exception',
+  })
+  @ApiParam({ name: 'id', type: 'string', required: true })
   async getCommands(@Param('id') id: string) {
     try {
       return await this.application.getTaskCommands(id);
@@ -93,11 +128,23 @@ export class TodoController implements OnModuleInit {
   }
 
   @Get()
+  @ApiResponse({ type: [TodoTaskSwagger], status: 200 })
   getTasks() {
     return this.todoRepository.getTasks();
   }
 
   @Get(':id')
+  @ApiResponse({ type: TodoTaskSwagger, status: 200 })
+  @ApiResponse({
+    status: 400,
+    description: 'Task validation exception',
+    type: ErrorModelSwagger,
+  })
+  @ApiNotFoundResponse({
+    type: ErrorModelSwagger,
+    description: 'Task not found exception',
+  })
+  @ApiParam({ name: 'id', type: 'string', required: true })
   async getTask(@Param('id') id: string) {
     try {
       return await this.application.getTask(id);
@@ -113,6 +160,17 @@ export class TodoController implements OnModuleInit {
   }
 
   @Put(':id/payload')
+  @ApiBody({ type: NewTodoSwagger })
+  @ApiResponse({ type: TodoTaskSwagger, status: 200 })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation exception',
+    type: ErrorModelSwagger,
+  })
+  @ApiNotFoundResponse({
+    type: ErrorModelSwagger,
+    description: 'Task not found exception',
+  })
   async updateTask(@Param('id') id: string, @Body() payload: Todo) {
     try {
       return (await this.application.updateTask(id, payload)).payload;
