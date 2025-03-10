@@ -5,12 +5,19 @@ import { InjectedToken, SERVICE_INJECTION_ARGS } from './decorators';
 export const TYPE_EXISTS_ERROR = 'Type exists in current context';
 export const UNKNOWN_ERROR = 'Unknown Error';
 
+/** The error occurs if the service has not been added to the context. */
 export class TokenDoesNotExistException<T = unknown> extends Error {
   constructor(token: string | Type<T>) {
     super(`Token "${tokenToString(token)}" doesn't exist in current context`);
   }
 }
 
+/**
+ * Simple DI container. Used when there is no possibility to use third-party solutions. For example, when using React.
+ *
+ * @implements IContext
+ * @implements IContextWriteable
+ * */
 export class Context implements IContext, IContextWriteable {
   private readonly singletonTypes = new Map<
     string | Type<unknown>,

@@ -9,6 +9,10 @@ export function getReadOperatorName(status: string) {
   return `__${status}_read_operator__`;
 }
 
+/**
+ * It gets metadata from the class marked with the Step decorator. From this metadata
+ * it takes the update and read classes and adds them to the context.
+ * */
 export function addStepOperatorsFromType<St extends Type<T>, T = unknown>(
   type: St
 ): ContextOperator {

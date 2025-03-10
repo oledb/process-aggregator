@@ -8,6 +8,15 @@ import {
   createProcessBuilder,
 } from '../process-builder';
 
+/**
+ * Function that creates baseApplication. It is used when Process Aggregator works independently without
+ * interaction with any framework. Otherwise, you need to write your own function with similar logic.
+ *
+ * @param module class with `@Module` decorator
+ * @param processName ProcessName
+ *
+ * @return BaseApplication
+ * */
 export function bootstrapApplication<S extends string, P, C extends string>(
   module: Type<object>,
   processName: ProcessName

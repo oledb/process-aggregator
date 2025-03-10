@@ -1,6 +1,11 @@
 import { STEP_METADATA_PROPERTY, StepDecoratorProperties } from './types';
 import { Type } from '../../context';
 
+/**
+ * The decorator marks the class that is used as a step. You can pass
+ * classes to it that are responsible for updating
+ * the task at this step and checking whether the task can be read.
+ * */
 export function Step<S extends string, P = unknown>(
   properties: StepDecoratorProperties<S, P>
 ) {

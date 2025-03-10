@@ -9,6 +9,11 @@ import { getModuleMetadata, ServiceProvider } from './types';
 import { addStepOperatorsFromType } from '../step';
 import { defaultContextFactory } from '../../context/context-builder';
 
+/** The function creates a context that manages the tree of dependent services. If you need to bind Process Aggregator
+ * to any framework, you need to implement a function with similar logic yourself.
+ *
+ * @param module class with `@Module` decorator
+ * */
 export function bootstrapContext(module: Type<unknown>): IContext {
   const getServices = (module: Type<unknown>): ServiceProvider<unknown>[] => {
     const meta = getModuleMetadata(module);

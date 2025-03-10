@@ -8,6 +8,12 @@ import {
 import { getModuleMetadata } from '../modules';
 import { UnknownErrorException } from '../exceptions';
 
+/**
+ * Gets a list of actions from the module metadata and adds them to the process
+ *
+ * @param module class with `@Module` decorator
+ * @return ProcessBuilderOperators
+ * */
 export function addRelationsAndStepsFromModule<
   S extends string,
   P,
@@ -35,6 +41,13 @@ export function addRelationsAndStepsFromModule<
   };
 }
 
+/**
+ * Gets information about steps and relationships in a process and adds them to the process
+ *
+ * @param actionsMeta metadata of the class with `@Action` metadata
+ * @return ProcessBuilderOperators
+ *
+ * */
 export function addRelationsAndStepsFromMetadata<
   S extends string,
   P,
@@ -62,6 +75,11 @@ export function addRelationsAndStepsFromMetadata<
   };
 }
 
+/**
+ * Gets the Action metadata and adds it to the context.
+ *
+ * @param actionType class with `@Action` or `@InitialAction` decorator
+ * */
 export function addActionToContext<A extends Type<T>, T = unknown>(
   actionType: A
 ): ContextOperator {
@@ -76,6 +94,12 @@ export function addActionToContext<A extends Type<T>, T = unknown>(
   };
 }
 
+/**
+ * Gets information about steps and relationships from Action metadata and adds them to the process
+ *
+ * @param actionType class with `@Action` decorator
+ * @return ProcessBuilderOperators
+ * */
 export function addRelationAndStepToProcess<
   A extends Type<T>,
   S extends string = string,
@@ -98,6 +122,7 @@ export function addRelationAndStepToProcess<
         context.addRelation(from, to, command as C);
       }
     } else {
+      // FIXME replace with DecoratorIsRequiredException and add tests
       throw new UnknownErrorException();
     }
     return context;

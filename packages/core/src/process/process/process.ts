@@ -21,6 +21,7 @@ import {
   UpdateMethodNotImplementedException,
 } from '../exceptions';
 
+/** Factory that creates the `Process` class. Used with the `ProcessBuilder` class. */
 export function getProcessFactory<
   S extends string,
   P,
@@ -29,6 +30,11 @@ export function getProcessFactory<
   return (processName, context) => new Process(processName, context);
 }
 
+/**
+ * The class is used to manage actions, steps, commands. Unlike the BaseApplication
+ * class, it provides a lower-level API, and also allows you to
+ * add steps and connections between them.
+ * */
 export class Process<S extends string, P, C extends string>
   implements IProcess<S, P, C>, IProcessWritable<S, P, C>
 {
